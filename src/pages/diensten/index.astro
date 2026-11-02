@@ -1,0 +1,108 @@
+---
+import Basis from '../../layouts/Basis.astro';
+import PaginaKop from '../../components/PaginaKop.astro';
+import Foto from '../../components/Foto.astro';
+import Pijl from '../../components/Pijl.astro';
+import OfferteSlot from '../../components/OfferteSlot.astro';
+import { diensten } from '../../data/diensten';
+import { kruimelSchema } from '../../lib/schema';
+import leefkeuken from '../../assets/beelden/leefkeuken.jpg';
+---
+
+<Basis
+  titel="Onze diensten: renovatie- en schilderwerken"
+  omschrijving="Schilderwerken, badkamerrenovaties, keukenrenovaties, vloerwerken en algemene renovaties in heel Vlaanderen. Ontdek wat Derycke voor uw woning of pand kan doen."
+  schema={[kruimelSchema(Astro.site, [{ naam: 'Diensten', href: '/diensten/' }])]}
+>
+  <PaginaKop
+    titel="Onze diensten"
+    intro="Vijf vakgebieden die in een renovatie vaak samenkomen. U kunt ons voor één specifieke opdracht inschakelen of voor een combinatie van werken die we op elkaar afstemmen."
+    kruimels={[{ naam: 'Diensten' }]}
+  />
+
+  <div class="wrap overzicht">
+    {
+      diensten.map((d, i) => (
+        <article class:list={['rij', { 'rij--om': i % 2 === 1 }]} aria-labelledby={`d-${d.slug}`}>
+          <a href={`/diensten/${d.slug}/`} class="rij__beeldlink" tabindex="-1" aria-hidden="true">
+            <Foto src={d.beeld.src} alt="" sizes="(min-width: 900px) 44vw, 100vw" widths={[600, 900, 1300]} ratio="4 / 3" />
+          </a>
+          <div class="rij__tekst">
+            <h2 id={`d-${d.slug}`}>
+              <a href={`/diensten/${d.slug}/`}>{d.titel}</a>
+            </h2>
+            <p class="rij__intro">{d.intro}</p>
+            <ul class="rij__werken">
+              {d.werken.map((w) => <li>{w.titel}</li>)}
+            </ul>
+            <a href={`/diensten/${d.slug}/`} class="tekstlink">
+              Meer over {d.titel.toLowerCase()} <Pijl />
+            </a>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+
+  <OfferteSlot titel="Combinatie van werken?" tekst="Veel projecten combineren meerdere diensten, bijvoorbeeld pleisterwerk, schilderwerk en een nieuwe vloer. Beschrijf uw volledige project, dan bekijken we het als één geheel." beeld={{ src: leefkeuken, alt: 'Open leefkeuken met eiland in natuursteen en eiken kasten' }} />
+</Basis>
+
+<style>
+  .overzicht {
+    padding-bottom: var(--sectie);
+  }
+  .rij {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2rem clamp(2rem, 6vw, 6rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+    border-top: 1px solid var(--steen-licht);
+  }
+  .rij--om .rij__beeldlink {
+    order: 2;
+  }
+  .rij__beeldlink {
+    display: block;
+  }
+  .rij h2 {
+    font-size: var(--fs-4);
+    margin-bottom: 1.1rem;
+  }
+  .rij h2 a {
+    text-decoration: none;
+  }
+  .rij h2 a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--brons);
+  }
+  .rij__intro {
+    max-width: 34rem;
+  }
+  .rij__werken {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 1.5rem 0 2rem;
+    padding: 0;
+  }
+  .rij__werken li {
+    font-size: var(--fs-0);
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--steen);
+    border-radius: 99px;
+    color: var(--steen-donker);
+  }
+  .rij .tekstlink :global(svg) {
+    width: 1rem;
+  }
+  @media (max-width: 900px) {
+    .rij {
+      grid-template-columns: 1fr;
+    }
+    .rij--om .rij__beeldlink {
+      order: 0;
+    }
+  }
+</style>

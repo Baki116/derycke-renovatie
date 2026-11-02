@@ -1,0 +1,158 @@
+---
+import Basis from '../layouts/Basis.astro';
+import PaginaKop from '../components/PaginaKop.astro';
+import Foto from '../components/Foto.astro';
+import Werkwijze from '../components/Werkwijze.astro';
+import OfferteSlot from '../components/OfferteSlot.astro';
+import { site } from '../config/site';
+import { kruimelSchema } from '../lib/schema';
+import inkomhal from '../assets/beelden/inkomhal.jpg';
+import lakwerk from '../assets/beelden/lakwerk-deur.jpg';
+import badkamer from '../assets/beelden/badkamer.jpg';
+
+const waarden = [
+  { titel: 'Vakmanschap', tekst: 'We kennen de materialen en technieken en nemen de tijd om ze correct toe te passen.' },
+  { titel: 'Betrouwbaarheid', tekst: 'Wat we afspreken, voeren we uit. Verandert er iets, dan hoort u het van ons.' },
+  { titel: 'Professionaliteit', tekst: 'Een georganiseerde werf, een correcte offerte en een verzorgde oplevering.' },
+  { titel: 'Hoogwaardige afwerking', tekst: 'De details maken het verschil: hoeken, randen, voegen en aansluitingen.' },
+  { titel: 'Duidelijke communicatie', tekst: 'U weet wat er gebeurt, wanneer het gebeurt en wie uw aanspreekpunt is.' },
+  { titel: 'Persoonlijke aanpak', tekst: 'Elke woning en elke klant is anders. We luisteren eerst en stellen dan voor.' },
+];
+---
+
+<Basis
+  titel="Over ons"
+  omschrijving="Derycke Renovatie & Schilderwerken staat voor vakmanschap, betrouwbaarheid en een verzorgde afwerking. Maak kennis met onze aanpak voor renovaties in heel Vlaanderen."
+  schema={[kruimelSchema(Astro.site, [{ naam: 'Over ons', href: '/over-ons/' }])]}
+>
+  <PaginaKop
+    titel="Een renovatie die tot in de details klopt."
+    intro="Derycke Renovatie & Schilderwerken voert renovatie- en schilderwerken uit voor particulieren, bedrijven en vastgoedprofessionals in heel Vlaanderen."
+    kruimels={[{ naam: 'Over ons' }]}
+  />
+
+  <section class="verhaal" aria-labelledby="verhaal-titel">
+    <div class="wrap verhaal__grid">
+      <Foto src={inkomhal} alt="Gerenoveerde inkomhal met grijs gelakte trap en een witte plafondlijst" sizes="(min-width: 900px) 48vw, 100vw" widths={[640, 960, 1400]} ratio="4 / 5" eager />
+      <div class="verhaal__tekst">
+        <h2 id="verhaal-titel">Waar we voor staan</h2>
+        <p>
+          Een geslaagde renovatie ziet u niet alleen bij de oplevering, maar ook jaren later. Daarom besteden we evenveel
+          aandacht aan de voorbereiding als aan het zichtbare resultaat: een goede ondergrond, de juiste materialen en een
+          logische volgorde van de werken.
+        </p>
+        <p>
+          We combineren schilderwerken, badkamer- en keukenrenovaties, vloerwerken en algemene renovatiewerken. Zo kunnen
+          we een volledig project opvolgen, of één onderdeel uitvoeren dat naadloos aansluit op het werk van andere
+          vakmensen.
+        </p>
+        <p>
+          U heeft één vast aanspreekpunt, krijgt een duidelijke offerte en weet op elk moment wat er gepland is.
+        </p>
+        {
+          site.demo && (
+            <p class="demo-melding">
+              Voorstel: vul deze pagina aan met het persoonlijke verhaal van de zaakvoerder en een foto van het team op de
+              werf. Echte gezichten en werfbeelden versterken het vertrouwen meer dan elke tekst.
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="sectie waarden" aria-labelledby="waarden-titel">
+    <div class="wrap">
+      <h2 id="waarden-titel">Zes principes op elke werf</h2>
+      <dl class="waarden__lijst">
+        {
+          waarden.map((w) => (
+            <div>
+              <dt>{w.titel}</dt>
+              <dd>{w.tekst}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="regio donker" aria-labelledby="regio-titel">
+    <div class="wrap regio__grid">
+      <div>
+        <h2 id="regio-titel">Actief in heel Vlaanderen</h2>
+        <p class="zacht maat">
+          We werken in de vijf Vlaamse provincies: West-Vlaanderen, Oost-Vlaanderen, Antwerpen, Vlaams-Brabant en
+          Limburg. Vermeld bij uw aanvraag de gemeente van het project, dan bekijken we de planning.
+        </p>
+      </div>
+      <Foto src={lakwerk} alt="Gelakte paneeldeur in warm steengrijs met bronzen deurklink" sizes="(min-width: 900px) 40vw, 100vw" widths={[600, 900, 1200]} ratio="3 / 2" />
+    </div>
+  </section>
+
+  <Werkwijze titel="Onze werkwijze" />
+  <OfferteSlot beeld={{ src: badkamer, alt: 'Badkamer met inloopdouche en een eiken badmeubel' }} />
+</Basis>
+
+<style>
+  .verhaal__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem clamp(2rem, 6vw, 7rem);
+    align-items: center;
+  }
+  .verhaal h2,
+  .waarden h2,
+  .regio h2 {
+    font-size: var(--fs-4);
+    margin-bottom: 1.5rem;
+  }
+  .verhaal__tekst {
+    max-width: var(--maat);
+  }
+  .verhaal__tekst .demo-melding {
+    margin-top: 2rem;
+  }
+  .waarden__lijst {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 clamp(1.5rem, 3vw, 3rem);
+    margin: 2.5rem 0 0;
+  }
+  .waarden__lijst div {
+    padding: 1.6rem 0 2rem;
+    border-top: 1px solid var(--antraciet);
+  }
+  .waarden__lijst dt {
+    font-size: var(--fs-3);
+    font-stretch: var(--breed);
+    font-weight: 500;
+    margin-bottom: 0.6rem;
+  }
+  .waarden__lijst dd {
+    margin: 0;
+    color: var(--steen-donker);
+    font-size: var(--fs-1);
+  }
+  .regio__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem clamp(2rem, 6vw, 7rem);
+    align-items: center;
+    padding-block: var(--sectie);
+  }
+  @media (max-width: 900px) {
+    .verhaal__grid,
+    .regio__grid {
+      grid-template-columns: 1fr;
+    }
+    .waarden__lijst {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .waarden__lijst {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

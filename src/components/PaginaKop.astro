@@ -1,0 +1,70 @@
+---
+/**
+ * Paginakop met kruimelpad. Geeft ook de BreadcrumbList terug via `kruimelSchema()`.
+ */
+interface Props {
+  titel: string;
+  intro?: string;
+  kruimels: { naam: string; href?: string }[];
+}
+const { titel, intro, kruimels } = Astro.props;
+---
+
+<header class="pk">
+  <div class="wrap">
+    <nav aria-label="Kruimelpad" class="pk__kruimel">
+      <ol>
+        <li><a href="/">Home</a></li>
+        {
+          kruimels.map((k) => (
+            <li>{k.href ? <a href={k.href}>{k.naam}</a> : <span aria-current="page">{k.naam}</span>}</li>
+          ))
+        }
+      </ol>
+    </nav>
+    <h1>{titel}</h1>
+    {intro && <p class="lead pk__intro">{intro}</p>}
+    <slot />
+  </div>
+</header>
+
+<style>
+  .pk {
+    padding-block: clamp(2.5rem, 2rem + 3vw, 5rem) clamp(2.5rem, 2rem + 3vw, 4.5rem);
+  }
+  .pk__kruimel ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0;
+    list-style: none;
+    margin: 0 0 clamp(1.75rem, 1.5rem + 1.5vw, 3rem);
+    padding: 0;
+    font-size: var(--fs-0);
+    color: var(--steen-donker);
+  }
+  .pk__kruimel li + li::before {
+    content: '/';
+    margin-inline: 0.6rem;
+    color: var(--steen);
+  }
+  .pk__kruimel a {
+    text-decoration: none;
+  }
+  .pk__kruimel a:hover {
+    text-decoration: underline;
+  }
+  h1 {
+    font-size: var(--fs-6);
+    max-width: 16ch;
+    hyphens: manual;
+  }
+  @media (max-width: 520px) {
+    h1 {
+      font-size: 2.15rem;
+    }
+  }
+  .pk__intro {
+    margin-top: 1.5rem;
+    max-width: 38rem;
+  }
+</style>

@@ -1,0 +1,536 @@
+---
+import Basis from '../layouts/Basis.astro';
+import Foto from '../components/Foto.astro';
+import Pijl from '../components/Pijl.astro';
+import Werkwijze from '../components/Werkwijze.astro';
+import OfferteSlot from '../components/OfferteSlot.astro';
+import RealisatieKaart from '../components/RealisatieKaart.astro';
+import { site } from '../config/site';
+import { diensten } from '../data/diensten';
+import { gepubliceerdeRealisaties } from '../lib/realisaties';
+import hero from '../assets/beelden/hero-woonkamer.jpg';
+import parket from '../assets/beelden/parket.jpg';
+import appartement from '../assets/beelden/appartement.jpg';
+
+const realisaties = (await gepubliceerdeRealisaties()).slice(0, 3);
+const alleenInspiratie = realisaties.every((r) => r.data.inspiratie);
+
+const redenen = [
+  { titel: 'Professionele en persoonlijke aanpak', tekst: 'U heeft één vast aanspreekpunt dat uw project kent, van het eerste gesprek tot de oplevering.' },
+  { titel: 'Kwaliteit en oog voor detail', tekst: 'Aansluitingen, hoeken en randen krijgen dezelfde zorg als de grote vlakken.' },
+  { titel: 'Duidelijke communicatie en afspraken', tekst: 'U weet vooraf welke werken gepland zijn en wat u kunt verwachten.' },
+  { titel: 'Renovatieoplossingen op maat', tekst: 'We vertrekken van uw woning, uw wensen en uw budget, niet van een standaardpakket.' },
+  { titel: 'Actief in heel Vlaanderen', tekst: 'Voor particulieren, bedrijven en vastgoedprofessionals in alle Vlaamse provincies.' },
+];
+---
+
+<Basis
+  titel="Derycke Renovatie & Schilderwerken | Vakmanschap in elke afwerking"
+  omschrijving="Renovatie- en schilderwerken in heel Vlaanderen: schilderwerken, badkamer- en keukenrenovaties, vloerwerken en algemene renovaties. Vraag uw vrijblijvende offerte aan."
+>
+  <!-- ── Hero ─────────────────────────────────────────────── -->
+  <section class="hero" aria-labelledby="hero-titel">
+    <div class="hero__tekst">
+      <p class="kicker">Renovatie- en schilderwerken in {site.regio}</p>
+      <h1 id="hero-titel">Vakmanschap in elke afwerking.</h1>
+      <span class="lijn hero__lijn" aria-hidden="true"></span>
+      <p class="hero__lead">
+        Van schilderwerken en vloeren tot een nieuwe badkamer of keuken: Derycke renoveert woningen en panden
+        voor particulieren, bedrijven en vastgoedprofessionals.
+      </p>
+      <div class="hero__acties">
+        <a href="/contact/#offerte" class="knop">Vraag uw vrijblijvende offerte aan <Pijl /></a>
+        <a href="/diensten/" class="tekstlink">Bekijk onze diensten</a>
+      </div>
+    </div>
+    <Foto
+      src={hero}
+      alt="Lichte, gerenoveerde woonkamer met kalkwitte muren, een hoog raam en een eiken visgraatvloer"
+      sizes="(min-width: 960px) 58vw, 100vw"
+      widths={[640, 960, 1280, 1600, 2048]}
+      eager
+      class="hero__beeld"
+      focus="62% 50%"
+    />
+  </section>
+
+  <!-- ── Presentatie ───────────────────────────────────────── -->
+  <section class="sectie intro" aria-label="Over Derycke">
+    <div class="wrap intro__grid">
+      <p class="intro__groot">
+        Derycke Renovatie &amp; Schilderwerken is uw partner voor professionele renovatie- en schilderwerken in heel
+        Vlaanderen.
+      </p>
+      <div class="intro__klein">
+        <p>
+          Van een stijlvolle badkamer of een moderne keuken tot nieuwe vloeren en strak schilderwerk: we werken naar een
+          kwalitatief eindresultaat, met aandacht voor elk detail.
+        </p>
+        <p>U kunt bij ons terecht als particulier, als bedrijf en als vastgoedprofessional.</p>
+        <a href="/over-ons/" class="tekstlink">Maak kennis met Derycke</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Diensten ──────────────────────────────────────────── -->
+  <section class="sectie diensten" aria-labelledby="diensten-titel" data-diensten>
+    <div class="wrap">
+      <div class="diensten__kop">
+        <h2 id="diensten-titel">Onze diensten</h2>
+        <p class="zacht maat">Vijf vakgebieden die in een renovatie vaak samenkomen. Wij stemmen ze op elkaar af.</p>
+      </div>
+      <div class="diensten__grid">
+        <ul class="diensten__lijst">
+          {
+            diensten.map((d, i) => (
+              <li>
+                <a href={`/diensten/${d.slug}/`} class="dienst" data-index={i}>
+                  <Foto src={d.beeld.src} alt="" sizes="96px" widths={[192]} ratio="1" class="dienst__mini" inspiratie={false} />
+                  <span class="dienst__tekst">
+                    <span class="dienst__titel">{d.titel}</span>
+                    <span class="dienst__kort">{d.kort}</span>
+                  </span>
+                  <span class="dienst__pijl"><Pijl /></span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="diensten__voorbeeld" aria-hidden="true">
+          {
+            diensten.map((d, i) => (
+              <div class:list={['diensten__laag', { 'is-actief': i === 0 }]} data-laag={i}>
+                <Foto src={d.beeld.src} alt="" sizes="(min-width: 960px) 36vw, 1px" widths={[600, 900, 1200]} ratio="4 / 5" />
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Realisaties ───────────────────────────────────────── -->
+  <section class="sectie realisaties" aria-labelledby="real-titel">
+    <div class="wrap">
+      <div class="realisaties__kop">
+        <h2 id="real-titel">{alleenInspiratie ? 'Inspiratie voor uw project' : 'Recente realisaties'}</h2>
+        <a href="/realisaties/" class="tekstlink">{alleenInspiratie ? 'Bekijk alle inspiratiebeelden' : 'Bekijk alle realisaties'}</a>
+      </div>
+      {
+        alleenInspiratie && (
+          <p class="demo-melding realisaties__melding">
+            Deze selectie bestaat uit inspiratiebeelden. Het zijn geen realisaties van Derycke. De eerste werven
+            verschijnen hier zodra ze gefotografeerd zijn.
+          </p>
+        )
+      }
+      <div class="realisaties__grid">
+        {
+          realisaties.map((r, i) => (
+            <RealisatieKaart
+              item={r}
+              ratio={i === 0 ? '4 / 5' : '3 / 2'}
+              sizes={i === 0 ? '(min-width: 900px) 45vw, 100vw' : '(min-width: 900px) 40vw, 100vw'}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Waarom Derycke ────────────────────────────────────── -->
+  <section class="sectie waarom" aria-labelledby="waarom-titel">
+    <div class="wrap waarom__grid">
+      <div class="waarom__links">
+        <h2 id="waarom-titel">Waarom kiezen voor Derycke?</h2>
+        <Foto
+          src={parket}
+          alt="Eiken visgraatparket dat strak aansluit op een witte plint"
+          sizes="(min-width: 960px) 34vw, 100vw"
+          widths={[600, 900, 1200]}
+          ratio="4 / 5"
+          class="waarom__beeld"
+        />
+      </div>
+      <ul class="waarom__lijst">
+        {
+          redenen.map((r) => (
+            <li>
+              <h3>{r.titel}</h3>
+              <p class="zacht">{r.tekst}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Werkwijze />
+
+  <!-- ── Voor bedrijven ────────────────────────────────────── -->
+  <section class="b2b donker" aria-labelledby="b2b-titel">
+    <div class="wrap b2b__grid">
+      <div class="b2b__tekst">
+        <p class="kicker">Voor bedrijven en vastgoed</p>
+        <h2 id="b2b-titel">Eén partner voor uw renovatie- en afwerkingswerken.</h2>
+        <p class="zacht maat">
+          Voor ondernemingen, vastgoedkantoren en projectontwikkelaars voeren we schilder-, vloer- en renovatiewerken uit in
+          kantoren, handelspanden, appartementen en woningen. Met heldere afspraken en een vast aanspreekpunt.
+        </p>
+        <ul class="lijst b2b__lijst">
+          <li>Bedrijven: kantoren en handelsruimtes opfrissen of herinrichten</li>
+          <li>Vastgoedkantoren: panden verkoop- of verhuurklaar maken</li>
+          <li>Promotoren: afwerking van appartementen en woningen</li>
+        </ul>
+        <a href="/voor-bedrijven/" class="knop knop--lijn">Ontdek onze aanpak voor bedrijven <Pijl /></a>
+      </div>
+      <Foto
+        src={appartement}
+        alt="Leeg, instapklaar appartement met lichte muren, eiken vloer en grote ramen"
+        sizes="(min-width: 960px) 50vw, 100vw"
+        widths={[640, 960, 1400]}
+        ratio="4 / 3"
+        class="b2b__beeld"
+      />
+    </div>
+  </section>
+
+  <OfferteSlot />
+</Basis>
+
+<style>
+  /* Hero */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
+    min-height: min(calc(100svh - 4.75rem), 54rem);
+    border-bottom: 1px solid var(--steen-licht);
+  }
+  .hero__tekst {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(3rem, 6vw, 6rem) clamp(2rem, 4vw, 4.5rem) clamp(3rem, 6vw, 5rem)
+      max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter)));
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 {
+    max-width: 9.5ch;
+    font-stretch: 108%;
+  }
+  /* De afwerkingslijn loopt vanuit de tekst door tot in het beeld */
+  .hero__lijn {
+    width: calc(100% + clamp(2rem, 4vw, 4.5rem) + 12vw);
+    margin: clamp(1.75rem, 3vw, 2.5rem) 0;
+    transform-origin: left center;
+    animation: lijn-trekken 1.4s 0.25s var(--ease) both;
+  }
+  @keyframes lijn-trekken {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  .hero__lead {
+    max-width: 30rem;
+    font-size: var(--fs-3);
+    line-height: 1.45;
+    color: var(--antraciet);
+  }
+  .hero__acties {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 2rem;
+    margin-top: 2.25rem;
+  }
+  :global(.hero__beeld) {
+    height: 100%;
+    min-height: 26rem;
+  }
+
+  /* Intro */
+  .intro__grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 2.5rem clamp(2rem, 7vw, 8rem);
+    align-items: start;
+  }
+  .intro__groot {
+    font-size: var(--fs-4);
+    font-stretch: var(--breed);
+    font-weight: 450;
+    line-height: 1.22;
+    letter-spacing: -0.01em;
+    margin: 0;
+    max-width: 22ch;
+  }
+  .intro__klein {
+    padding-top: 0.5rem;
+    max-width: 30rem;
+  }
+  .intro__klein .tekstlink {
+    margin-top: 0.75rem;
+  }
+
+  /* Diensten */
+  .diensten {
+    background: var(--wit);
+    border-block: 1px solid var(--steen-licht);
+  }
+  .diensten__kop,
+  .realisaties__kop {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem 3rem;
+    margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+  .diensten__kop p {
+    max-width: 26rem;
+  }
+  .diensten__grid {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: clamp(2rem, 5vw, 6rem);
+    align-items: start;
+  }
+  .diensten__lijst {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--steen-licht);
+  }
+  .dienst {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 1.5rem;
+    padding: clamp(1.25rem, 1rem + 1vw, 1.9rem) 0;
+    border-bottom: 1px solid var(--steen-licht);
+    text-decoration: none;
+    position: relative;
+  }
+  .dienst::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    height: 1px;
+    width: 100%;
+    background: var(--brons);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--ease);
+  }
+  .dienst:hover::after,
+  .dienst:focus-visible::after,
+  .dienst.is-actief::after {
+    transform: scaleX(1);
+  }
+  :global(.dienst__mini) {
+    display: none;
+  }
+  .dienst__tekst {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .dienst__titel {
+    font-size: var(--fs-4);
+    font-weight: 480;
+    font-stretch: var(--breed);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .dienst__kort {
+    color: var(--steen-donker);
+    font-size: var(--fs-1);
+  }
+  .dienst__pijl {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--steen);
+    border-radius: 50%;
+    transition: background-color 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
+  }
+  .dienst__pijl :global(svg) {
+    width: 1.1rem;
+  }
+  .dienst:hover .dienst__pijl,
+  .dienst:focus-visible .dienst__pijl {
+    background: var(--antraciet);
+    border-color: var(--antraciet);
+    color: var(--kalk);
+  }
+  .diensten__voorbeeld {
+    position: sticky;
+    top: 7rem;
+    display: grid;
+  }
+  .diensten__laag {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+  }
+  .diensten__laag.is-actief {
+    opacity: 1;
+  }
+
+  /* Realisaties */
+  .realisaties__melding {
+    margin: -1.25rem 0 2.5rem;
+  }
+  .realisaties__grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 2.5rem clamp(1.5rem, 3vw, 3rem);
+  }
+  .realisaties__grid > :global(:first-child) {
+    grid-row: span 2;
+  }
+
+  /* Waarom */
+  .waarom {
+    padding-top: 0;
+  }
+  .waarom__grid {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 3rem clamp(2rem, 7vw, 8rem);
+    border-top: 1px solid var(--steen-licht);
+    padding-top: var(--sectie);
+  }
+  .waarom__links h2 {
+    margin-bottom: 2.5rem;
+    max-width: 12ch;
+  }
+  :global(.waarom__beeld) {
+    max-width: 26rem;
+  }
+  .waarom__lijst {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-self: end;
+  }
+  .waarom__lijst li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.5rem 2rem;
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--steen-licht);
+  }
+  .waarom__lijst li:last-child {
+    border-bottom: 1px solid var(--steen-licht);
+  }
+  .waarom__lijst h3 {
+    font-size: 1.2rem;
+  }
+  .waarom__lijst p {
+    font-size: var(--fs-1);
+  }
+
+  /* B2B */
+  .b2b__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem clamp(2rem, 6vw, 7rem);
+    align-items: center;
+    padding-block: var(--sectie);
+  }
+  .b2b h2 {
+    font-size: var(--fs-5);
+    margin-bottom: 1.5rem;
+    max-width: 16ch;
+  }
+  .b2b__lijst {
+    margin: 2rem 0 2.5rem;
+    max-width: 34rem;
+  }
+
+  @media (max-width: 960px) {
+    .hero {
+      grid-template-columns: 1fr;
+      min-height: 0;
+    }
+    :global(.hero__beeld) {
+      order: -1;
+      min-height: 0;
+      aspect-ratio: 4 / 3;
+      max-height: 58svh;
+      width: 100%;
+    }
+    .hero__tekst {
+      padding: 2.25rem var(--gutter) 3.25rem;
+    }
+    .hero__lijn {
+      width: 100%;
+    }
+    .intro__grid,
+    .diensten__grid,
+    .waarom__grid,
+    .b2b__grid {
+      grid-template-columns: 1fr;
+    }
+    .diensten__voorbeeld {
+      display: none;
+    }
+    .dienst {
+      grid-template-columns: 4.5rem 1fr auto;
+      gap: 1.1rem;
+    }
+    :global(.dienst__mini) {
+      display: block;
+      width: 4.5rem;
+    }
+    .realisaties__grid {
+      grid-template-columns: 1fr;
+    }
+    .realisaties__grid > :global(:first-child) {
+      grid-row: auto;
+    }
+    :global(.waarom__beeld) {
+      max-width: none;
+      aspect-ratio: 16 / 10 !important;
+    }
+    .waarom__lijst li {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 520px) {
+    .dienst {
+      grid-template-columns: 3.5rem 1fr;
+    }
+    .dienst__titel {
+      font-size: 1.4rem;
+    }
+    :global(.dienst__mini) {
+      width: 3.5rem;
+    }
+    .dienst__pijl {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Voorbeeldbeeld naast de dienstenlijst (enkel desktop, puur visueel)
+  const lagen = document.querySelectorAll<HTMLElement>('[data-laag]');
+  const links = document.querySelectorAll<HTMLAnchorElement>('.dienst[data-index]');
+  const activeer = (i: string | undefined) => {
+    if (i === undefined) return;
+    lagen.forEach((l) => l.classList.toggle('is-actief', l.dataset.laag === i));
+    links.forEach((a) => a.classList.toggle('is-actief', a.dataset.index === i));
+  };
+  links.forEach((a) => {
+    a.addEventListener('mouseenter', () => activeer(a.dataset.index));
+    a.addEventListener('focus', () => activeer(a.dataset.index));
+  });
+</script>

@@ -1,0 +1,61 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Foto from './Foto.astro';
+
+interface Props {
+  item: CollectionEntry<'realisaties'>;
+  sizes: string;
+  ratio?: string;
+  koptag?: 'h2' | 'h3';
+}
+const { item, sizes, ratio = '4 / 3', koptag: Kop = 'h3' } = Astro.props;
+const d = item.data;
+const meta = [d.typeWerken, d.gemeente].filter(Boolean).join(', ');
+---
+
+<article class="rk">
+  <a href={`/realisaties/${item.id}/`} class="rk__link">
+    <Foto src={d.hoofdfoto} alt={d.hoofdfotoAlt} sizes={sizes} ratio={ratio} inspiratie={d.inspiratie} class="rk__beeld" />
+    <div class="rk__tekst">
+      <Kop class="rk__titel">{d.titel}</Kop>
+      <p class="rk__meta">{meta}</p>
+    </div>
+  </a>
+</article>
+
+<style>
+  .rk__link {
+    display: block;
+    text-decoration: none;
+  }
+  .rk :global(.rk__beeld img) {
+    transition: transform 0.9s var(--ease);
+  }
+  .rk__link:hover :global(.rk__beeld img) {
+    transform: scale(1.025);
+  }
+  .rk__tekst {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    padding-top: 1rem;
+    border-bottom: 1px solid var(--steen-licht);
+    padding-bottom: 1rem;
+  }
+  .rk__titel {
+    font-size: 1.15rem;
+    line-height: 1.3;
+  }
+  .rk__link:hover .rk__titel {
+    text-decoration: underline;
+    text-decoration-color: var(--brons);
+    text-underline-offset: 0.22em;
+  }
+  .rk__meta {
+    margin: 0;
+    font-size: var(--fs-1);
+    color: var(--steen-donker);
+  }
+</style>

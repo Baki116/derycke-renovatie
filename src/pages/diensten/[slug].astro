@@ -1,0 +1,298 @@
+---
+import Basis from '../../layouts/Basis.astro';
+import PaginaKop from '../../components/PaginaKop.astro';
+import Foto from '../../components/Foto.astro';
+import Pijl from '../../components/Pijl.astro';
+import { diensten, type Dienst } from '../../data/diensten';
+import { kruimelSchema, faqSchema } from '../../lib/schema';
+import { site } from '../../config/site';
+
+export function getStaticPaths() {
+  return diensten.map((d) => ({ params: { slug: d.slug }, props: { dienst: d } }));
+}
+
+const { dienst } = Astro.props as { dienst: Dienst };
+const andere = diensten.filter((d) => d.slug !== dienst.slug);
+const offerteLink = `/contact/?type=${encodeURIComponent(dienst.titel)}#offerte`;
+
+const schema = [
+  kruimelSchema(Astro.site, [
+    { naam: 'Diensten', href: '/diensten/' },
+    { naam: dienst.titel, href: `/diensten/${dienst.slug}/` },
+  ]),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: dienst.titel,
+    description: dienst.seoOmschrijving,
+    areaServed: { '@type': 'AdministrativeArea', name: 'Vlaanderen' },
+    provider: { '@id': new URL('/#bedrijf', Astro.site).href },
+  },
+  ...(dienst.faq.length ? [faqSchema(dienst.faq)] : []),
+];
+---
+
+<Basis titel={dienst.seoTitel} omschrijving={dienst.seoOmschrijving} schema={schema}>
+  <PaginaKop titel={dienst.titel.replace(/(Badkamer|Keuken)(renovaties)/, '$1\u00AD$2')} intro={dienst.intro} kruimels={[{ naam: 'Diensten', href: '/diensten/' }, { naam: dienst.titel }]}>
+    <div class="acties">
+      <a href={offerteLink} class="knop">Vraag een offerte voor {dienst.titel.toLowerCase()} <Pijl /></a>
+    </div>
+  </PaginaKop>
+
+  <div class="wrap beelden">
+    <Foto src={dienst.beeld.src} alt={dienst.beeld.alt} sizes="(min-width: 900px) 55vw, 100vw" widths={[640, 960, 1400]} ratio="4 / 5" eager class="beelden__groot" />
+    <Foto src={dienst.detailbeeld.src} alt={dienst.detailbeeld.alt} sizes="(min-width: 900px) 38vw, 100vw" widths={[600, 900, 1200]} ratio="3 / 2" class="beelden__klein" />
+  </div>
+
+  <section class="sectie" aria-labelledby="wanneer">
+    <div class="wrap twee">
+      <h2 id="wanneer">Wanneer kiest u voor {dienst.titel.toLowerCase()}?</h2>
+      <ul class="lijst">
+        {dienst.wanneer.map((w) => <li>{w}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="sectie werken" aria-labelledby="werken">
+    <div class="wrap">
+      <h2 id="werken" class="werken__titel">Wat we uitvoeren</h2>
+      <dl class="werken__lijst">
+        {
+          dienst.werken.map((w) => (
+            <div>
+              <dt>{w.titel}</dt>
+              <dd>{w.tekst}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="sectie offerte-sectie" aria-labelledby="offerte-info">
+    <div class="wrap">
+      <div class="paneel donker">
+        <div>
+          <h2 id="offerte-info">Wat helpt voor een correcte offerte?</h2>
+          <p class="zacht">Hoe meer we vooraf weten, hoe gerichter we uw aanvraag kunnen bekijken. Deze gegevens zijn handig, maar niet verplicht.</p>
+        </div>
+        <div>
+          <ul class="lijst">
+            {dienst.offerte.map((o) => <li>{o}</li>)}
+          </ul>
+          <a href={offerteLink} class="knop knop--licht paneel__knop">Vraag uw vrijblijvende offerte aan <Pijl /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    dienst.faq.length > 0 && (
+      <section class="sectie faq" aria-labelledby="faq">
+        <div class="wrap twee">
+          <h2 id="faq">Veelgestelde vragen</h2>
+          <div class="faq__lijst">
+            {dienst.faq.map((f) => (
+              <details>
+                <summary>
+                  <span>{f.vraag}</span>
+                  <span class="faq__plus" aria-hidden="true" />
+                </summary>
+                <p>{f.antwoord}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <nav class="sectie andere" aria-labelledby="andere">
+    <div class="wrap">
+      <h2 id="andere" class="andere__titel">Andere diensten</h2>
+      <ul>
+        {
+          andere.map((d) => (
+            <li>
+              <a href={`/diensten/${d.slug}/`}>
+                <span>{d.titel}</span>
+                <Pijl />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      {site.demo && <p class="demo-melding andere__demo">Beelden op deze pagina zijn inspiratiebeelden.</p>}
+    </div>
+  </nav>
+</Basis>
+
+<style>
+  .acties {
+    margin-top: 2.25rem;
+  }
+  .beelden {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: clamp(1rem, 3vw, 3rem);
+    align-items: end;
+  }
+  :global(.beelden__klein) {
+    margin-bottom: clamp(0rem, 8vw, 7rem);
+  }
+  .twee {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem clamp(2rem, 6vw, 7rem);
+    align-items: start;
+  }
+  .twee h2,
+  .werken__titel,
+  .andere__titel {
+    font-size: var(--fs-4);
+    max-width: 16ch;
+  }
+  .werken {
+    padding-top: 0;
+  }
+  .werken__titel {
+    margin-bottom: 2.5rem;
+  }
+  .werken__lijst {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0 clamp(1.5rem, 3vw, 3rem);
+    margin: 0;
+  }
+  .werken__lijst div {
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--antraciet);
+  }
+  .werken__lijst dt {
+    font-size: 1.15rem;
+    font-weight: 540;
+    font-stretch: var(--breed);
+    margin-bottom: 0.6rem;
+  }
+  .werken__lijst dd {
+    margin: 0;
+    color: var(--steen-donker);
+    font-size: var(--fs-1);
+  }
+  .offerte-sectie {
+    padding-top: 0;
+  }
+  .paneel {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem clamp(2rem, 6vw, 6rem);
+    padding: clamp(2rem, 1.5rem + 3vw, 4.5rem);
+  }
+  .paneel h2 {
+    font-size: var(--fs-4);
+    margin-bottom: 1.25rem;
+    max-width: 16ch;
+  }
+  .paneel__knop {
+    margin-top: 2rem;
+  }
+  .faq {
+    padding-top: 0;
+  }
+  .faq__lijst {
+    border-top: 1px solid var(--steen-licht);
+  }
+  details {
+    border-bottom: 1px solid var(--steen-licht);
+  }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.3rem 0;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 520;
+    font-size: 1.08rem;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq__plus {
+    position: relative;
+    flex: none;
+    width: 14px;
+    height: 14px;
+  }
+  .faq__plus::before,
+  .faq__plus::after {
+    content: '';
+    position: absolute;
+    inset: 6.5px 0 auto;
+    height: 1px;
+    background: currentColor;
+    transition: transform 0.3s var(--ease);
+  }
+  .faq__plus::after {
+    transform: rotate(90deg);
+  }
+  details[open] .faq__plus::after {
+    transform: rotate(0);
+  }
+  details p {
+    padding: 0 0 1.5rem;
+    max-width: 40rem;
+    color: var(--steen-donker);
+  }
+  .andere {
+    background: var(--wit);
+    border-top: 1px solid var(--steen-licht);
+  }
+  .andere__titel {
+    margin-bottom: 2rem;
+  }
+  .andere ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 3rem;
+  }
+  .andere a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--steen-licht);
+    text-decoration: none;
+    font-size: var(--fs-3);
+    font-stretch: var(--breed);
+  }
+  .andere a :global(svg) {
+    width: 1.2rem;
+    transition: transform 0.25s var(--ease);
+  }
+  .andere a:hover :global(svg) {
+    transform: translateX(4px);
+  }
+  .andere a:hover span {
+    text-decoration: underline;
+    text-decoration-color: var(--brons);
+  }
+  .andere__demo {
+    margin-top: 2rem;
+  }
+  @media (max-width: 900px) {
+    .beelden,
+    .twee,
+    .paneel,
+    .andere ul {
+      grid-template-columns: 1fr;
+    }
+    :global(.beelden__klein) {
+      margin-bottom: 0;
+    }
+  }
+</style>

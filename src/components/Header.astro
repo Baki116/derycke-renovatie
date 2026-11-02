@@ -1,0 +1,238 @@
+---
+import Logo from './Logo.astro';
+import { navigatie, site } from '../config/site';
+import { diensten } from '../data/diensten';
+
+const pad = Astro.url.pathname;
+const isActief = (href: string) => pad === href || (href !== '/' && pad.startsWith(href));
+---
+
+<header class="kop" data-kop>
+  <div class="wrap kop__binnen">
+    <a href="/" class="kop__logo">
+      <Logo /><span class="sr-only">, naar de startpagina</span>
+    </a>
+
+    <nav class="kop__nav" aria-label="Hoofdnavigatie">
+      <ul>
+        {
+          navigatie.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isActief(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li><a href="/contact/" aria-current={isActief('/contact/') ? 'page' : undefined}>Contact</a></li>
+      </ul>
+    </nav>
+
+    <a href="/contact/#offerte" class="knop kop__cta">Offerte aanvragen</a>
+
+    <button class="kop__menuknop" type="button" aria-expanded="false" aria-controls="mobiel-menu" data-menuknop>
+      <span class="kop__menulabel" data-menulabel>Menu</span>
+      <span class="kop__burger" aria-hidden="true"><span></span><span></span></span>
+    </button>
+  </div>
+
+  <div id="mobiel-menu" class="mobiel" hidden data-menu>
+    <div class="wrap mobiel__binnen">
+      <nav aria-label="Mobiele navigatie">
+        <ul class="mobiel__hoofd">
+          <li><a href="/">Home</a></li>
+          {navigatie.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+        <p class="mobiel__titel">Onze diensten</p>
+        <ul class="mobiel__diensten">
+          {diensten.map((d) => <li><a href={`/diensten/${d.slug}/`}>{d.titel}</a></li>)}
+        </ul>
+      </nav>
+      <a href="/contact/#offerte" class="knop mobiel__cta">Vraag uw vrijblijvende offerte aan</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .kop {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--kalk) 94%, transparent);
+    backdrop-filter: saturate(1.1) blur(8px);
+    -webkit-backdrop-filter: saturate(1.1) blur(8px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s var(--ease);
+  }
+  .kop[data-gescrold] {
+    border-bottom-color: var(--steen-licht);
+  }
+  .kop__binnen {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    min-height: 4.75rem;
+  }
+  .kop__logo {
+    text-decoration: none;
+    display: inline-flex;
+    padding-block: 0.5rem;
+  }
+  .kop__nav {
+    margin-left: auto;
+  }
+  .kop__nav ul {
+    display: flex;
+    gap: 1.9rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .kop__nav a {
+    position: relative;
+    font-size: var(--fs-1);
+    font-weight: 480;
+    text-decoration: none;
+    padding-block: 0.5rem;
+  }
+  .kop__nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.1rem;
+    height: 1px;
+    background: var(--brons);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--ease);
+  }
+  .kop__nav a:hover::after,
+  .kop__nav a[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+  .kop__cta {
+    min-height: 2.75rem;
+    padding: 0.6rem 1.1rem;
+  }
+
+  .kop__menuknop {
+    display: none;
+    margin-left: auto;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0 0.5rem 0.75rem;
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    font-size: var(--fs-1);
+    font-weight: 520;
+    cursor: pointer;
+  }
+  .kop__burger {
+    display: grid;
+    gap: 6px;
+    width: 22px;
+  }
+  .kop__burger span {
+    display: block;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.3s var(--ease);
+  }
+  [aria-expanded='true'] .kop__burger span:first-child {
+    transform: translateY(3.75px) rotate(45deg);
+  }
+  [aria-expanded='true'] .kop__burger span:last-child {
+    transform: translateY(-3.75px) rotate(-45deg);
+  }
+
+  .mobiel {
+    border-top: 1px solid var(--steen-licht);
+    background: var(--kalk);
+    max-height: calc(100dvh - 4.75rem);
+    overflow-y: auto;
+  }
+  .mobiel__binnen {
+    padding-block: 1.5rem 2rem;
+  }
+  .mobiel ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .mobiel__hoofd a {
+    display: block;
+    padding: 0.7rem 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+    font-stretch: var(--breed);
+    text-decoration: none;
+    border-bottom: 1px solid var(--steen-licht);
+  }
+  .mobiel__titel {
+    margin: 1.75rem 0 0.25rem;
+    font-size: var(--fs-1);
+    color: var(--steen-donker);
+  }
+  .mobiel__diensten a {
+    display: block;
+    padding: 0.55rem 0;
+    text-decoration: none;
+  }
+  .mobiel__cta {
+    margin-top: 1.75rem;
+    width: 100%;
+  }
+
+  @media (max-width: 1080px) {
+    .kop__nav ul {
+      gap: 1.35rem;
+    }
+  }
+  @media (max-width: 960px) {
+    .kop__nav,
+    .kop__cta {
+      display: none;
+    }
+    .kop__menuknop {
+      display: inline-flex;
+    }
+  }
+  @media (min-width: 961px) {
+    .mobiel {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const kop = document.querySelector<HTMLElement>('[data-kop]');
+  const knop = document.querySelector<HTMLButtonElement>('[data-menuknop]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const label = document.querySelector<HTMLElement>('[data-menulabel]');
+
+  function zet(open: boolean) {
+    if (!knop || !menu || !label) return;
+    knop.setAttribute('aria-expanded', String(open));
+    menu.hidden = !open;
+    label.textContent = open ? 'Sluiten' : 'Menu';
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+  }
+
+  knop?.addEventListener('click', () => zet(knop.getAttribute('aria-expanded') !== 'true'));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && knop?.getAttribute('aria-expanded') === 'true') {
+      zet(false);
+      knop.focus();
+    }
+  });
+  menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => zet(false)));
+
+  const onScroll = () => kop?.toggleAttribute('data-gescrold', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>

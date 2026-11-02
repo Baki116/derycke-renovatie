@@ -1,0 +1,163 @@
+---
+import Basis from '../layouts/Basis.astro';
+import PaginaKop from '../components/PaginaKop.astro';
+import Foto from '../components/Foto.astro';
+import Pijl from '../components/Pijl.astro';
+import OfferteSlot from '../components/OfferteSlot.astro';
+import { kruimelSchema } from '../lib/schema';
+import appartement from '../assets/beelden/appartement.jpg';
+import pleisterwerk from '../assets/beelden/pleisterwerk.jpg';
+import inkomhal from '../assets/beelden/inkomhal.jpg';
+
+const doelgroepen = [
+  {
+    titel: 'Bedrijven',
+    tekst: 'Kantoren, praktijkruimtes en handelspanden opfrissen of herinrichten. We stemmen de planning af op uw activiteiten, zodat de hinder beperkt blijft.',
+    werken: ['Schilderwerken in kantoren en handelsruimtes', 'Nieuwe scheidingswanden en verlaagde plafonds', 'Vloervernieuwing', 'Sanitaire ruimtes en kitchenettes'],
+  },
+  {
+    titel: 'Vastgoedkantoren',
+    tekst: 'Een pand dat verzorgd oogt, verkoopt of verhuurt vlotter. We maken woningen en appartementen klaar voor plaatsbezoeken en nieuwe bewoners.',
+    werken: ['Opfrissen tussen twee huurders', 'Verkoopklaar maken van woningen', 'Herstellingen na plaatsbeschrijving', 'Badkamer- en keukenvernieuwing'],
+  },
+  {
+    titel: 'Promotoren en ontwikkelaars',
+    tekst: 'Afwerking van nieuwbouw- en renovatieprojecten met meerdere eenheden, met een vast aanspreekpunt en heldere afspraken per fase.',
+    werken: ['Pleister- en gyprocwerken', 'Schilderwerken per appartement', 'Vloerwerken', 'Badkamers en keukens'],
+  },
+];
+
+const aanpak = [
+  { titel: 'Vast aanspreekpunt', tekst: 'Eén contactpersoon die uw project en uw verwachtingen kent.' },
+  { titel: 'Heldere offerte per project of fase', tekst: 'Zodat u kosten kunt plannen en goedkeuren binnen uw organisatie.' },
+  { titel: 'Planning in overleg', tekst: 'Afgestemd op opleverdata, huurwissels of de openingsuren van uw zaak.' },
+  { titel: 'Verzorgde werf', tekst: 'Een opgeruimde werkplek en een pand dat na de werken meteen bruikbaar is.' },
+];
+---
+
+<Basis
+  titel="Voor bedrijven, vastgoedkantoren en promotoren"
+  omschrijving="Renovatie-, schilder- en afwerkingswerken voor bedrijven, vastgoedkantoren en projectontwikkelaars in heel Vlaanderen. Eén aanspreekpunt en heldere afspraken."
+  schema={[kruimelSchema(Astro.site, [{ naam: 'Voor bedrijven', href: '/voor-bedrijven/' }])]}
+>
+  <PaginaKop
+    titel="Renovatie en afwerking voor professionals."
+    intro="Voor bedrijven, vastgoedkantoren en promotoren voert Derycke schilder-, vloer- en renovatiewerken uit in kantoren, handelspanden, appartementen en woningen."
+    kruimels={[{ naam: 'Voor bedrijven' }]}
+  >
+    <div class="acties">
+      <a href="/contact/?klant=professioneel#offerte" class="knop">Bespreek uw project <Pijl /></a>
+    </div>
+  </PaginaKop>
+
+  <div class="wrap">
+    <Foto src={appartement} alt="Leeg, instapklaar appartement met lichte muren en een eiken vloer" sizes="(min-width: 1320px) 1240px, 100vw" widths={[640, 960, 1400, 2000]} ratio="21 / 9" eager class="breed" />
+  </div>
+
+  <section class="sectie" aria-labelledby="voor-wie">
+    <div class="wrap">
+      <h2 id="voor-wie" class="titel">Voor wie we werken</h2>
+      <div class="doelgroepen">
+        {
+          doelgroepen.map((g) => (
+            <article>
+              <h3>{g.titel}</h3>
+              <p class="zacht">{g.tekst}</p>
+              <ul class="lijst">
+                {g.werken.map((w) => <li>{w}</li>)}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="aanpak donker" aria-labelledby="aanpak-titel">
+    <div class="wrap aanpak__grid">
+      <div>
+        <h2 id="aanpak-titel" class="titel">Wat u van ons mag verwachten</h2>
+        <dl class="aanpak__lijst">
+          {
+            aanpak.map((a) => (
+              <div>
+                <dt>{a.titel}</dt>
+                <dd>{a.tekst}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+      <Foto src={pleisterwerk} alt="Ruimte in afwerkingsfase met vers pleisterwerk en inbouwspots" sizes="(min-width: 900px) 38vw, 100vw" widths={[600, 900, 1200]} ratio="4 / 5" />
+    </div>
+  </section>
+
+  <OfferteSlot
+    titel="Een project in voorbereiding?"
+    tekst="Bezorg ons de plannen, het aantal eenheden of een beschrijving van de werken. We nemen contact met u op om de mogelijkheden en de planning te bespreken."
+    beeld={{ src: inkomhal, alt: 'Gerenoveerde inkomhal met gelakte trap' }}
+  />
+</Basis>
+
+<style>
+  .acties {
+    margin-top: 2.25rem;
+  }
+  .titel {
+    font-size: var(--fs-4);
+    margin-bottom: 2.5rem;
+  }
+  .doelgroepen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.5rem clamp(1.5rem, 3vw, 3rem);
+  }
+  .doelgroepen article {
+    border-top: 1px solid var(--antraciet);
+    padding-top: 1.6rem;
+  }
+  .doelgroepen h3 {
+    font-size: var(--fs-3);
+    margin-bottom: 0.9rem;
+  }
+  .doelgroepen .lijst {
+    margin-top: 1.5rem;
+    font-size: var(--fs-1);
+  }
+  .aanpak__grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 3rem clamp(2rem, 6vw, 7rem);
+    align-items: center;
+    padding-block: var(--sectie);
+  }
+  .aanpak__lijst {
+    margin: 0;
+  }
+  .aanpak__lijst div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 0.4rem 2rem;
+    padding: 1.4rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .aanpak__lijst dt {
+    font-weight: 540;
+    font-stretch: var(--breed);
+  }
+  .aanpak__lijst dd {
+    margin: 0;
+    color: var(--op-donker);
+    font-size: var(--fs-1);
+  }
+  @media (max-width: 900px) {
+    .doelgroepen,
+    .aanpak__grid,
+    .aanpak__lijst div {
+      grid-template-columns: 1fr;
+    }
+    :global(.breed) {
+      aspect-ratio: 4 / 3 !important;
+    }
+  }
+</style>

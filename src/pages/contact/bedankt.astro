@@ -1,0 +1,29 @@
+---
+import Basis from '../../layouts/Basis.astro';
+---
+
+<Basis titel="Aanvraag verzonden" omschrijving="Uw offerteaanvraag werd verzonden." noindex>
+  <section class="sectie">
+    <div class="wrap bedankt">
+      <span class="lijn" aria-hidden="true"></span>
+      <h1>Bedankt, uw aanvraag is verzonden.</h1>
+      <p class="lead">We hebben uw offerteaanvraag goed ontvangen en nemen contact met u op om uw project te bespreken.</p>
+      <a href="/" class="tekstlink">Terug naar de startpagina</a>
+    </div>
+  </section>
+</Basis>
+
+<style>
+  .bedankt .lijn {
+    width: 6rem;
+    margin-bottom: 2rem;
+  }
+  h1 {
+    font-size: var(--fs-5);
+    max-width: 16ch;
+    margin-bottom: 1.5rem;
+  }
+  .lead {
+    margin-bottom: 2rem;
+  }
+</style>

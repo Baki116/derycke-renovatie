@@ -1,0 +1,138 @@
+---
+import Basis from '../../layouts/Basis.astro';
+import PaginaKop from '../../components/PaginaKop.astro';
+import OfferteFormulier from '../../components/OfferteFormulier.astro';
+import { site, ontbreekt } from '../../config/site';
+import { kruimelSchema } from '../../lib/schema';
+
+const { contact, adres } = site;
+const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+---
+
+<Basis
+  titel="Contact en offerte aanvragen"
+  omschrijving="Vraag uw vrijblijvende offerte aan voor schilderwerken, badkamer- of keukenrenovatie, vloerwerken of algemene renovatie in heel Vlaanderen. Voeg gerust foto's toe."
+  schema={[kruimelSchema(Astro.site, [{ naam: 'Contact', href: '/contact/' }])]}
+>
+  <PaginaKop
+    titel="Vraag uw vrijblijvende offerte aan."
+    intro="Beschrijf uw project en voeg gerust enkele foto's toe. Hoe beter we uw situatie kennen, hoe gerichter we kunnen antwoorden."
+    kruimels={[{ naam: 'Contact' }]}
+  />
+
+  <div class="wrap contact">
+    <section class="contact__form" id="offerte" aria-labelledby="form-titel">
+      <h2 id="form-titel" class="sr-only">Offerteformulier</h2>
+      {
+        site.demo && (
+          <p class="demo-melding contact__demo">
+            Demoversie: het formulier verstuurt pas berichten nadat de e-mailkoppeling (Resend) en het ontvangstadres
+            ingesteld zijn. Tot dan krijgt u een duidelijke foutmelding en wordt er niets verzonden.
+          </p>
+        )
+      }
+      <OfferteFormulier />
+    </section>
+
+    <aside class="contact__info" aria-labelledby="info-titel">
+      <h2 id="info-titel">Rechtstreeks contact</h2>
+      <dl>
+        <div>
+          <dt>Telefoon</dt>
+          <dd>
+            {
+              contact.telefoon ? (
+                <a href={`tel:${contact.telefoon.replace(/\s/g, '')}`}>{contact.telefoonWeergave ?? contact.telefoon}</a>
+              ) : (
+                <span class="leeg">{ontbreekt}</span>
+              )
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>E-mail</dt>
+          <dd>
+            {contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : <span class="leeg">{ontbreekt}</span>}
+          </dd>
+        </div>
+        <div>
+          <dt>Adres</dt>
+          <dd>{adresRegel || <span class="leeg">{ontbreekt}</span>}</dd>
+        </div>
+        <div>
+          <dt>Werkgebied</dt>
+          <dd>Heel Vlaanderen</dd>
+        </div>
+      </dl>
+
+      <div class="contact__tips">
+        <h3>Tips voor uw aanvraag</h3>
+        <ul class="lijst">
+          <li>Vermeld de ruimtes en, indien gekend, de oppervlakte.</li>
+          <li>Foto's bij daglicht geven de huidige toestand het best weer.</li>
+          <li>Heeft u plannen of inspiratiebeelden? Vermeld dat in uw beschrijving.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</Basis>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: 3rem clamp(2rem, 6vw, 7rem);
+    padding-bottom: var(--sectie);
+    align-items: start;
+  }
+  .contact__demo {
+    margin-bottom: 2rem;
+  }
+  .contact__info {
+    position: sticky;
+    top: 7rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    background: var(--wit);
+    border: 1px solid var(--steen-licht);
+  }
+  .contact__info h2 {
+    font-size: var(--fs-3);
+    margin-bottom: 1.25rem;
+  }
+  dl {
+    margin: 0;
+  }
+  dl div {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    border-top: 1px solid var(--steen-licht);
+    font-size: var(--fs-1);
+  }
+  dt {
+    color: var(--steen-donker);
+  }
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  .contact__tips {
+    margin-top: 2rem;
+  }
+  .contact__tips h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.75rem;
+  }
+  .contact__tips .lijst {
+    font-size: var(--fs-1);
+  }
+  @media (max-width: 960px) {
+    .contact {
+      grid-template-columns: 1fr;
+    }
+    .contact__info {
+      position: static;
+    }
+  }
+</style>

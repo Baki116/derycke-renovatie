@@ -1,0 +1,148 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import Basis from '../../layouts/Basis.astro';
+import PaginaKop from '../../components/PaginaKop.astro';
+import Foto from '../../components/Foto.astro';
+import Pijl from '../../components/Pijl.astro';
+import OfferteSlot from '../../components/OfferteSlot.astro';
+import { gepubliceerdeRealisaties } from '../../lib/realisaties';
+import { diensten } from '../../data/diensten';
+import { kruimelSchema } from '../../lib/schema';
+
+export async function getStaticPaths() {
+  const items = await gepubliceerdeRealisaties();
+  return items.map((item) => ({ params: { id: item.id }, props: { item } }));
+}
+
+const { item } = Astro.props as { item: CollectionEntry<'realisaties'> };
+const d = item.data;
+const { Content } = await render(item);
+const dienst = diensten.find((x) => x.titel === d.typeWerken);
+const kenmerken = [
+  { label: 'Type werken', waarde: d.typeWerken },
+  ...(d.gemeente ? [{ label: 'Gemeente', waarde: d.gemeente }] : []),
+];
+---
+
+<Basis
+  titel={d.inspiratie ? `Inspiratie: ${d.titel}` : d.titel}
+  omschrijving={d.samenvatting}
+  schema={[
+    kruimelSchema(Astro.site, [
+      { naam: 'Realisaties', href: '/realisaties/' },
+      { naam: d.titel, href: `/realisaties/${item.id}/` },
+    ]),
+  ]}
+>
+  <PaginaKop titel={d.titel} intro={d.samenvatting} kruimels={[{ naam: 'Realisaties', href: '/realisaties/' }, { naam: d.titel }]}>
+    {
+      d.inspiratie && (
+        <p class="demo-melding insp">
+          Inspiratiebeeld. Dit is geen project dat door Derycke uitgevoerd werd. Het toont de stijl en afwerking die we
+          nastreven.
+        </p>
+      )
+    }
+  </PaginaKop>
+
+  <div class="wrap">
+    <Foto src={d.hoofdfoto} alt={d.hoofdfotoAlt} sizes="(min-width: 1320px) 1240px, 100vw" widths={[640, 960, 1400, 2000]} ratio={d.hoofdfoto.width > d.hoofdfoto.height ? '3 / 2' : '4 / 5'} inspiratie={d.inspiratie} eager class:list={['hoofd', { 'hoofd--staand': d.hoofdfoto.height > d.hoofdfoto.width }]} />
+  </div>
+
+  <section class="sectie" aria-label="Over dit project">
+    <div class="wrap tekstgrid">
+      <dl class="kenmerken">
+        {
+          kenmerken.map((k) => (
+            <div>
+              <dt>{k.label}</dt>
+              <dd>{k.waarde}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="verhaal">
+        <Content />
+        {
+          dienst && (
+            <a href={`/diensten/${dienst.slug}/`} class="tekstlink">
+              Meer over {dienst.titel.toLowerCase()} <Pijl />
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  {
+    d.galerij.length > 0 && (
+      <section class="galerij wrap" aria-label="Fotogalerij">
+        {d.galerij.map((g) => (
+          <Foto src={g.foto} alt={g.alt} sizes="(min-width: 900px) 45vw, 100vw" widths={[600, 900, 1300]} ratio="3 / 2" inspiratie={d.inspiratie} />
+        ))}
+      </section>
+    )
+  }
+
+  <div class="wrap terug">
+    <a href="/realisaties/" class="tekstlink">Terug naar alle realisaties</a>
+  </div>
+
+  <OfferteSlot beeld={{ src: d.galerij[0]?.foto ?? d.hoofdfoto, alt: d.galerij[0]?.alt ?? d.hoofdfotoAlt, inspiratie: d.inspiratie }} />
+</Basis>
+
+<style>
+  .insp {
+    margin-top: 1.75rem;
+  }
+  :global(.hoofd--staand) {
+    max-width: 44rem;
+  }
+  .tekstgrid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem clamp(2rem, 6vw, 7rem);
+  }
+  .kenmerken {
+    margin: 0;
+  }
+  .kenmerken div {
+    padding: 1rem 0;
+    border-top: 1px solid var(--steen-licht);
+  }
+  .kenmerken dt {
+    font-size: var(--fs-0);
+    color: var(--steen-donker);
+  }
+  .kenmerken dd {
+    margin: 0.2rem 0 0;
+    font-weight: 520;
+  }
+  .verhaal {
+    max-width: var(--maat);
+  }
+  .verhaal :global(p) {
+    font-size: 1.12rem;
+  }
+  .verhaal .tekstlink {
+    margin-top: 1.5rem;
+  }
+  .verhaal .tekstlink :global(svg) {
+    width: 1rem;
+  }
+  .galerij {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 2vw, 2rem);
+    padding-bottom: var(--sectie);
+  }
+  .terug {
+    padding-bottom: var(--sectie);
+  }
+  @media (max-width: 760px) {
+    .tekstgrid,
+    .galerij {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

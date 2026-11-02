@@ -1,0 +1,65 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { site } from '../config/site';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  sizes: string;
+  widths?: number[];
+  class?: string;
+  /** Toon het label "Inspiratiebeeld" (enkel in de demoversie). */
+  inspiratie?: boolean;
+  eager?: boolean;
+  /** CSS object-position voor het cropping-punt, bv. "60% 50%". */
+  focus?: string;
+  /** Vaste beeldverhouding, bv. "4 / 5". */
+  ratio?: string;
+}
+
+const {
+  src,
+  alt,
+  sizes,
+  widths = [480, 768, 1080, 1440, 2000],
+  class: klasse,
+  inspiratie = true,
+  eager = false,
+  focus,
+  ratio,
+} = Astro.props;
+
+const bruikbareBreedtes = widths.filter((w) => w <= src.width);
+if (!bruikbareBreedtes.includes(src.width) && bruikbareBreedtes.length < widths.length) bruikbareBreedtes.push(src.width);
+---
+
+<figure
+  class:list={['beeld', klasse]}
+  style={[ratio ? `aspect-ratio:${ratio}` : '', focus ? `--focus:${focus}` : ''].filter(Boolean).join(';') || undefined}
+>
+  <Picture
+    src={src}
+    alt={alt}
+    widths={bruikbareBreedtes}
+    sizes={sizes}
+    formats={['avif', 'webp']}
+    fallbackFormat="jpg"
+    quality={72}
+    loading={eager ? 'eager' : 'lazy'}
+    fetchpriority={eager ? 'high' : undefined}
+    decoding={eager ? 'sync' : 'async'}
+    style={focus ? 'object-position: var(--focus)' : undefined}
+  />
+  {inspiratie && site.demo && <span class="insp-label">Inspiratiebeeld</span>}
+  <slot />
+</figure>
+
+<style>
+  figure {
+    margin: 0;
+  }
+  figure :global(picture) {
+    display: contents;
+  }
+</style>

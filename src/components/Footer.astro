@@ -1,0 +1,179 @@
+---
+import Logo from './Logo.astro';
+import { site, navigatie, ontbreekt } from '../config/site';
+import { diensten } from '../data/diensten';
+
+const { contact, adres, onderneming } = site;
+const jaar = new Date().getFullYear();
+const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+---
+
+<footer class="voet donker">
+  <div class="wrap">
+    <div class="voet__top">
+      <div class="voet__merk">
+        <Logo />
+        <p class="voet__slogan">{site.slogan}</p>
+        <p class="zacht">Renovatie- en schilderwerken voor particulieren, bedrijven en vastgoedprofessionals in {site.regio}.</p>
+      </div>
+
+      <nav class="voet__kol" aria-label="Diensten">
+        <p class="voet__titel">Diensten</p>
+        <ul>
+          {diensten.map((d) => <li><a href={`/diensten/${d.slug}/`}>{d.titel}</a></li>)}
+        </ul>
+      </nav>
+
+      <nav class="voet__kol" aria-label="Over Derycke">
+        <p class="voet__titel">Derycke</p>
+        <ul>
+          {navigatie.filter((n) => n.href !== '/diensten/').map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+          <li><a href="/contact/">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="voet__kol">
+        <p class="voet__titel">Contact</p>
+        <ul class="voet__contact">
+          <li>
+            {
+              contact.telefoon ? (
+                <a href={`tel:${contact.telefoon.replace(/\s/g, '')}`}>{contact.telefoonWeergave ?? contact.telefoon}</a>
+              ) : (
+                site.demo && <span class="voet__leeg">Telefoon: {ontbreekt}</span>
+              )
+            }
+          </li>
+          <li>
+            {
+              contact.email ? (
+                <a href={`mailto:${contact.email}`}>{contact.email}</a>
+              ) : (
+                site.demo && <span class="voet__leeg">E-mail: {ontbreekt}</span>
+              )
+            }
+          </li>
+          <li>{adresRegel || (site.demo && <span class="voet__leeg">Adres: {ontbreekt}</span>)}</li>
+        </ul>
+        <a href="/contact/#offerte" class="knop knop--licht voet__cta">Offerte aanvragen</a>
+      </div>
+    </div>
+
+    <span class="lijn" aria-hidden="true"></span>
+
+    <div class="voet__onder">
+      <p>
+        © {jaar} {site.naam}
+        {onderneming.rechtsvorm && <> {onderneming.rechtsvorm}</>}
+        {
+          onderneming.ondernemingsnummer ? (
+            <>, ondernemingsnummer {onderneming.ondernemingsnummer}</>
+          ) : (
+            site.demo && <span class="voet__leeg">, ondernemingsnummer: {ontbreekt}</span>
+          )
+        }
+      </p>
+      <ul>
+        <li><a href="/privacyverklaring/">Privacyverklaring</a></li>
+        <li><a href="/sitemap-index.xml">Sitemap</a></li>
+      </ul>
+    </div>
+    {
+      site.demo && (
+        <p class="voet__demo">
+          Demoversie. De identiteit is een voorstel en de beelden zijn inspiratiebeelden, geen realisaties van Derycke.
+        </p>
+      )
+    }
+  </div>
+</footer>
+
+<style>
+  .voet {
+    padding-block: clamp(4rem, 3rem + 4vw, 6.5rem) 2rem;
+    font-size: var(--fs-1);
+  }
+  .voet__top {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.3fr;
+    gap: 3rem 2.5rem;
+    padding-bottom: 3.5rem;
+  }
+  .voet__slogan {
+    margin: 2rem 0 0.6rem;
+    font-size: var(--fs-3);
+    font-stretch: var(--breed);
+    font-weight: 450;
+    line-height: 1.25;
+  }
+  .voet__merk .zacht {
+    max-width: 22rem;
+  }
+  .voet__titel {
+    color: var(--op-donker);
+    margin-bottom: 0.9rem;
+  }
+  .voet ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .voet li + li {
+    margin-top: 0.5rem;
+  }
+  .voet a {
+    text-decoration: none;
+  }
+  .voet a:not(.knop):hover {
+    text-decoration: underline;
+    text-decoration-color: var(--brons-licht);
+  }
+  .voet__contact {
+    margin-bottom: 1.5rem !important;
+  }
+  .voet__leeg {
+    color: var(--op-donker);
+    font-style: italic;
+  }
+  .voet__cta {
+    min-height: 2.9rem;
+  }
+  .voet__onder {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding-top: 1.5rem;
+    color: var(--op-donker);
+    font-size: var(--fs-0);
+  }
+  .voet__onder p {
+    margin: 0;
+  }
+  .voet__onder ul {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .voet__onder li + li {
+    margin-top: 0;
+  }
+  .voet__demo {
+    margin: 1.5rem 0 0;
+    color: var(--op-donker);
+    font-size: var(--fs-0);
+  }
+
+  @media (max-width: 960px) {
+    .voet__top {
+      grid-template-columns: 1fr 1fr;
+    }
+    .voet__merk {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 560px) {
+    .voet__top {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

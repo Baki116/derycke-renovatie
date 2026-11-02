@@ -1,0 +1,126 @@
+---
+import { site } from '../config/site';
+
+interface Props {
+  titel?: string;
+}
+const { titel = 'Zo verloopt uw project' } = Astro.props;
+
+const stappen = [
+  { titel: 'Eerste contact', tekst: 'U beschrijft uw project via het formulier of telefonisch. Foto’s helpen ons om meteen een beeld te vormen.' },
+  { titel: 'Gesprek over uw project', tekst: 'We bespreken uw wensen, de huidige toestand en wat u belangrijk vindt, indien nodig ter plaatse.' },
+  { titel: 'Offerte', tekst: 'U ontvangt een duidelijke offerte met een omschrijving van de werken, zodat u weet waar u aan toe bent.' },
+  { titel: 'Planning', tekst: 'Na uw akkoord leggen we samen de timing vast en stemmen we de volgorde van de werken af.' },
+  { titel: 'Uitvoering en oplevering', tekst: 'We voeren de werken zorgvuldig uit, houden u op de hoogte en overlopen het resultaat samen met u.' },
+];
+---
+
+<section class="sectie werkwijze" aria-labelledby="werkwijze-titel">
+  <div class="wrap">
+    <div class="werkwijze__kop">
+      <h2 id="werkwijze-titel">{titel}</h2>
+      <p class="zacht maat">Vijf duidelijke stappen, van uw eerste vraag tot de oplevering. U heeft telkens één aanspreekpunt.</p>
+    </div>
+
+    <ol class="werkwijze__stappen">
+      {
+        stappen.map((s, i) => (
+          <li>
+            <span class="werkwijze__nr" aria-hidden="true">{i + 1}</span>
+            <h3>{s.titel}</h3>
+            <p class="zacht">{s.tekst}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    {site.demo && <p class="demo-melding werkwijze__demo">Voorgestelde werkwijze, af te stemmen op de werkelijke organisatie van Derycke.</p>}
+  </div>
+</section>
+
+<style>
+  .werkwijze__kop {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 4rem;
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+  .werkwijze__stappen {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2rem;
+    position: relative;
+  }
+  /* de afwerkingslijn als tijdslijn */
+  .werkwijze__stappen::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 1.15rem;
+    height: 1px;
+    background: var(--brons);
+  }
+  .werkwijze__stappen li {
+    position: relative;
+  }
+  .werkwijze__nr {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    margin-bottom: 1.4rem;
+    background: var(--kalk);
+    border: 1px solid var(--brons);
+    border-radius: 50%;
+    font-size: var(--fs-1);
+    font-weight: 560;
+    font-variant-numeric: tabular-nums;
+    color: var(--brons);
+  }
+  .werkwijze h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.6rem;
+  }
+  .werkwijze p {
+    font-size: var(--fs-1);
+  }
+  .werkwijze__demo {
+    margin-top: 2.5rem;
+  }
+
+  @media (max-width: 960px) {
+    .werkwijze__kop {
+      grid-template-columns: 1fr;
+    }
+    .werkwijze__stappen {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .werkwijze__stappen::before {
+      top: 0;
+      bottom: 0;
+      left: 1.15rem;
+      right: auto;
+      width: 1px;
+      height: auto;
+    }
+    .werkwijze__stappen li {
+      padding: 0 0 2rem 3.75rem;
+    }
+    .werkwijze__stappen li:last-child {
+      padding-bottom: 0;
+    }
+    .werkwijze__nr {
+      position: absolute;
+      left: 0;
+      top: -0.35rem;
+      margin: 0;
+    }
+  }
+</style>

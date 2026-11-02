@@ -1,0 +1,39 @@
+---
+import Basis from '../layouts/Basis.astro';
+import { diensten } from '../data/diensten';
+---
+
+<Basis titel="Pagina niet gevonden" omschrijving="Deze pagina bestaat niet of werd verplaatst." noindex>
+  <section class="sectie">
+    <div class="wrap nf">
+      <span class="lijn" aria-hidden="true"></span>
+      <h1>Deze pagina bestaat niet (meer).</h1>
+      <p class="lead zacht">Misschien werd ze verplaatst. Kies hieronder waar u naartoe wilt.</p>
+      <ul>
+        <li><a href="/">Startpagina</a></li>
+        {diensten.map((d) => <li><a href={`/diensten/${d.slug}/`}>{d.titel}</a></li>)}
+        <li><a href="/contact/#offerte">Offerte aanvragen</a></li>
+      </ul>
+    </div>
+  </section>
+</Basis>
+
+<style>
+  .nf .lijn {
+    width: 6rem;
+    margin-bottom: 2rem;
+  }
+  h1 {
+    font-size: var(--fs-5);
+    max-width: 18ch;
+    margin-bottom: 1.25rem;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 2.5rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.75rem;
+  }
+</style>

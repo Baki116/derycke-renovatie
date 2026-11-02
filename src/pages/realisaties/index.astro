@@ -1,0 +1,164 @@
+---
+import Basis from '../../layouts/Basis.astro';
+import PaginaKop from '../../components/PaginaKop.astro';
+import RealisatieKaart from '../../components/RealisatieKaart.astro';
+import OfferteSlot from '../../components/OfferteSlot.astro';
+import { gepubliceerdeRealisaties } from '../../lib/realisaties';
+import { kruimelSchema } from '../../lib/schema';
+import parket from '../../assets/beelden/parket.jpg';
+
+const items = await gepubliceerdeRealisaties();
+const echte = items.filter((r) => !r.data.inspiratie);
+const inspiratie = items.filter((r) => r.data.inspiratie);
+const types = [...new Set(items.map((r) => r.data.typeWerken))];
+---
+
+<Basis
+  titel="Realisaties"
+  omschrijving="Bekijk renovatie- en schilderprojecten van Derycke Renovatie & Schilderwerken in Vlaanderen: schilderwerken, badkamers, keukens, vloeren en algemene renovaties."
+  schema={[kruimelSchema(Astro.site, [{ naam: 'Realisaties', href: '/realisaties/' }])]}
+>
+  <PaginaKop
+    titel="Realisaties"
+    intro={echte.length
+      ? 'Een selectie van uitgevoerde projecten. Elk project toont het type werken en, met toestemming van de klant, de gemeente.'
+      : 'Hier verschijnen binnenkort de eerste projecten van Derycke. Intussen tonen we een selectie inspiratiebeelden die de stijl en afwerking weergeven die we nastreven.'}
+    kruimels={[{ naam: 'Realisaties' }]}
+  />
+
+  <div class="wrap">
+    {
+      types.length > 1 && (
+        <div class="filter" role="group" aria-label="Filter op type werken" data-filter hidden>
+          <button type="button" aria-pressed="true" data-type="alle">Alle</button>
+          {types.map((t) => (
+            <button type="button" aria-pressed="false" data-type={t}>
+              {t}
+            </button>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      echte.length > 0 && (
+        <section aria-labelledby="echte" class="blok">
+          <h2 id="echte" class="sr-only">Uitgevoerde projecten</h2>
+          <div class="raster">
+            {echte.map((r) => (
+              <div data-item={r.data.typeWerken}>
+                <RealisatieKaart item={r} koptag="h3" sizes="(min-width: 900px) 45vw, 100vw" />
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      inspiratie.length > 0 && (
+        <section aria-labelledby="insp" class="blok">
+          <div class="blok__kop">
+            <h2 id="insp">Inspiratiebeelden</h2>
+            <p class="demo-melding">
+              Deze beelden zijn inspiratiebeelden en tonen geen projecten die door Derycke uitgevoerd zijn. Ze worden
+              vervangen door echte realisaties.
+            </p>
+          </div>
+          <div class="raster">
+            {inspiratie.map((r) => (
+              <div data-item={r.data.typeWerken}>
+                <RealisatieKaart item={r} koptag="h3" sizes="(min-width: 900px) 45vw, 100vw" />
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <p class="leegmelding zacht" data-leeg hidden>Er zijn nog geen projecten voor dit type werken.</p>
+  </div>
+
+  <OfferteSlot titel="Uw project als volgende?" beeld={{ src: parket, alt: 'Eiken visgraatparket dat aansluit op een witte plint' }} />
+</Basis>
+
+<style>
+  .filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 3rem;
+  }
+  .filter button {
+    font: inherit;
+    font-size: var(--fs-1);
+    min-height: 2.75rem;
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--rand-veld);
+    background: transparent;
+    color: var(--antraciet);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .filter button:hover {
+    background: var(--wit);
+  }
+  .filter button[aria-pressed='true'] {
+    background: var(--antraciet);
+    border-color: var(--antraciet);
+    color: var(--kalk);
+  }
+  .blok {
+    padding-bottom: var(--sectie);
+  }
+  .blok__kop {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .blok__kop h2 {
+    font-size: var(--fs-4);
+  }
+  .raster {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3rem clamp(1.5rem, 3vw, 3rem);
+  }
+  .raster > [hidden] {
+    display: none;
+  }
+  .leegmelding {
+    padding-bottom: var(--sectie);
+  }
+  @media (max-width: 760px) {
+    .raster {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const filter = document.querySelector<HTMLElement>('[data-filter]');
+  if (filter) {
+    filter.hidden = false;
+    const knoppen = filter.querySelectorAll<HTMLButtonElement>('button');
+    const items = document.querySelectorAll<HTMLElement>('[data-item]');
+    const blokken = document.querySelectorAll<HTMLElement>('.blok');
+    const leeg = document.querySelector<HTMLElement>('[data-leeg]');
+    knoppen.forEach((k) =>
+      k.addEventListener('click', () => {
+        const t = k.dataset.type;
+        knoppen.forEach((b) => b.setAttribute('aria-pressed', String(b === k)));
+        let zichtbaar = 0;
+        items.forEach((it) => {
+          const toon = t === 'alle' || it.dataset.item === t;
+          it.hidden = !toon;
+          if (toon) zichtbaar++;
+        });
+        blokken.forEach((b) => (b.hidden = !b.querySelector('[data-item]:not([hidden])')));
+        if (leeg) leeg.hidden = zichtbaar > 0;
+      }),
+    );
+  }
+</script>

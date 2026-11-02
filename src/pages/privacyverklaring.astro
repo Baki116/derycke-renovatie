@@ -1,0 +1,143 @@
+---
+import Basis from '../layouts/Basis.astro';
+import PaginaKop from '../components/PaginaKop.astro';
+import { site, ontbreekt } from '../config/site';
+import { kruimelSchema } from '../lib/schema';
+
+const { contact, adres, onderneming } = site;
+const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+const leeg = (v: string | null) => v ?? `[${ontbreekt}]`;
+---
+
+<Basis
+  titel="Privacyverklaring"
+  omschrijving="Hoe Derycke Renovatie & Schilderwerken omgaat met de persoonsgegevens die u via de website en het offerteformulier bezorgt."
+  schema={[kruimelSchema(Astro.site, [{ naam: 'Privacyverklaring', href: '/privacyverklaring/' }])]}
+>
+  <PaginaKop titel="Privacyverklaring" kruimels={[{ naam: 'Privacyverklaring' }]}>
+    {
+      site.demo && (
+        <p class="demo-melding concept">
+          Basisversie ter voorbereiding, niet juridisch gevalideerd. De gegevens tussen vierkante haken moeten vóór
+          publicatie ingevuld worden, en de tekst kan best nagelezen worden door een jurist of adviseur.
+        </p>
+      )
+    }
+  </PaginaKop>
+
+  <article class="wrap tekst">
+    <p class="zacht">Laatst bijgewerkt: [datum van publicatie]</p>
+
+    <h2>1. Wie is verantwoordelijk voor uw gegevens?</h2>
+    <p>
+      De verwerkingsverantwoordelijke is {site.naam}{onderneming.rechtsvorm ? ` ${onderneming.rechtsvorm}` : ''},
+      met ondernemingsnummer {leeg(onderneming.ondernemingsnummer)}, gevestigd te {adresRegel || `[${ontbreekt}]`}.
+    </p>
+    <p>
+      Voor vragen over uw gegevens kunt u terecht bij {leeg(site.privacyContact)}, via
+      {contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : ` [${ontbreekt}]`}{contact.telefoon ? ` of ${contact.telefoon}` : ''}.
+    </p>
+
+    <h2>2. Welke gegevens verwerken we?</h2>
+    <p>Wanneer u het offerteformulier invult, verwerken we:</p>
+    <ul>
+      <li>uw naam, e-mailadres en, als u dat invult, uw telefoonnummer;</li>
+      <li>de gemeente of postcode van het project;</li>
+      <li>of u particulier, bedrijf of vastgoedprofessional bent, als u dat aanduidt;</li>
+      <li>het type werken, de gewenste timing en de beschrijving van uw project;</li>
+      <li>de foto's die u meestuurt. Foto's kunnen persoonlijke elementen tonen; we vragen u enkel beelden van de betrokken ruimtes te sturen.</li>
+    </ul>
+    <p>
+      Bij elk bezoek aan de website registreert de hostingpartner technische gegevens zoals uw IP-adres en het tijdstip
+      van de aanvraag. Die gegevens dienen voor de beveiliging en de goede werking van de website.
+    </p>
+
+    <h2>3. Waarom en op welke basis?</h2>
+    <ul>
+      <li>
+        <strong>Uw aanvraag beantwoorden en een offerte opmaken.</strong> Rechtsgrond: maatregelen die op uw verzoek
+        genomen worden vóór het sluiten van een overeenkomst (art. 6.1.b AVG).
+      </li>
+      <li>
+        <strong>Beveiliging van de website en het voorkomen van misbruik.</strong> Rechtsgrond: ons gerechtvaardigd
+        belang (art. 6.1.f AVG).
+      </li>
+    </ul>
+    <p>We gebruiken uw gegevens niet voor reclame en verkopen ze niet door.</p>
+
+    <h2>4. Met wie delen we uw gegevens?</h2>
+    <p>We doen een beroep op enkele dienstverleners die uw gegevens enkel in onze opdracht verwerken:</p>
+    <ul>
+      <li><strong>Vercel</strong>, voor de hosting van de website en de verwerking van het formulier;</li>
+      <li><strong>Resend</strong>, voor het doorsturen van uw aanvraag per e-mail naar ons;</li>
+      <li><strong>[e-mailprovider van Derycke]</strong>, waar de aanvragen in onze mailbox terechtkomen.</li>
+    </ul>
+    <p>
+      Sommige van deze dienstverleners kunnen gegevens buiten de Europese Economische Ruimte verwerken. In dat geval
+      gebeurt dat op basis van passende waarborgen, zoals de standaardcontractbepalingen van de Europese Commissie.
+      [Te controleren bij de gekozen diensten en regio.]
+    </p>
+
+    <h2>5. Hoe lang bewaren we uw gegevens?</h2>
+    <p>
+      We bewaren uw aanvraag zolang nodig is om ze te behandelen en op te volgen. Leidt de aanvraag niet tot een
+      opdracht, dan verwijderen we ze uiterlijk [termijn, bv. 12 maanden] na ons laatste contact. Gegevens die nodig zijn
+      voor de uitvoering van een opdracht of voor onze boekhouding bewaren we volgens de wettelijke termijnen.
+    </p>
+
+    <h2>6. Cookies</h2>
+    <p>
+      Deze website gebruikt geen cookies voor statistieken of reclame en laadt geen externe lettertypes of
+      trackingdiensten. Er is daarom geen cookiebanner nodig. Voegt Derycke later zulke diensten toe, dan wordt deze
+      verklaring aangepast en vragen we vooraf uw toestemming.
+    </p>
+
+    <h2>7. Uw rechten</h2>
+    <p>
+      U heeft het recht om uw gegevens in te zien, te laten verbeteren of verwijderen, de verwerking te laten beperken,
+      bezwaar te maken en uw gegevens over te dragen. Stuur daarvoor een bericht naar
+      {contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : ` [${ontbreekt}]`}. We antwoorden binnen de
+      wettelijke termijn van één maand.
+    </p>
+    <p>
+      Bent u niet tevreden over hoe we met uw gegevens omgaan, dan kunt u een klacht indienen bij de
+      Gegevensbeschermingsautoriteit, Drukpersstraat 35, 1000 Brussel,
+      <a href="https://www.gegevensbeschermingsautoriteit.be" rel="noopener">www.gegevensbeschermingsautoriteit.be</a>.
+    </p>
+
+    <h2>8. Beveiliging</h2>
+    <p>
+      De website werkt uitsluitend via een beveiligde verbinding (https). Formuliergegevens worden niet in een databank
+      op de website bewaard, maar rechtstreeks per e-mail naar ons doorgestuurd.
+    </p>
+
+    <h2>9. Wijzigingen</h2>
+    <p>We kunnen deze verklaring aanpassen. De datum bovenaan toont wanneer ze het laatst gewijzigd werd.</p>
+  </article>
+</Basis>
+
+<style>
+  .concept {
+    margin-top: 1.75rem;
+  }
+  .tekst {
+    padding-bottom: var(--sectie);
+  }
+  .tekst > * {
+    max-width: calc(var(--maat) + 4rem);
+  }
+  .tekst h2 {
+    font-size: var(--fs-3);
+    margin: 2.75rem 0 1rem;
+  }
+  .tekst ul {
+    padding-left: 1.2rem;
+    margin: 0 0 1em;
+  }
+  .tekst li {
+    margin-bottom: 0.5rem;
+  }
+  .tekst a {
+    overflow-wrap: anywhere;
+  }
+</style>

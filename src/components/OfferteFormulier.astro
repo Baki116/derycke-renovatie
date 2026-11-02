@@ -1,0 +1,703 @@
+---
+import { typeWerken } from '../data/diensten';
+import { REGELS, TIMING, KLANTTYPE } from '../lib/offerte-regels';
+
+const fout = Astro.url.searchParams.get('fout');
+---
+
+<form
+  class="of"
+  action="/api/offerte/"
+  method="post"
+  enctype="multipart/form-data"
+  novalidate
+  data-offerte
+  aria-describedby="of-uitleg"
+>
+  <p id="of-uitleg" class="of__uitleg zacht">Velden met <span aria-hidden="true">*</span><span class="sr-only">een sterretje</span> zijn verplicht.</p>
+
+  {
+    fout && (
+      <div class="of__melding of__melding--fout" role="alert">
+        <p>
+          <strong>Uw aanvraag is niet verzonden.</strong> {decodeURIComponent(fout)}
+        </p>
+      </div>
+    )
+  }
+
+  <div class="of__foutlijst" role="alert" tabindex="-1" hidden data-foutlijst>
+    <p><strong>Controleer de volgende velden:</strong></p>
+    <ul></ul>
+  </div>
+
+  <fieldset class="of__groep">
+    <legend>Uw gegevens</legend>
+    <div class="of__rij of__rij--2">
+      <div class="veld">
+        <label for="naam">Naam <span aria-hidden="true">*</span></label>
+        <input id="naam" name="naam" type="text" autocomplete="name" required maxlength="120" />
+        <p class="veld__fout" id="naam-fout" hidden></p>
+      </div>
+      <div class="veld">
+        <label for="email">E-mailadres <span aria-hidden="true">*</span></label>
+        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="160" />
+        <p class="veld__fout" id="email-fout" hidden></p>
+      </div>
+    </div>
+    <div class="of__rij of__rij--2">
+      <div class="veld">
+        <label for="telefoon">Telefoonnummer <span class="veld__opt">(optioneel)</span></label>
+        <input id="telefoon" name="telefoon" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" aria-describedby="telefoon-hulp" />
+        <p class="veld__hulp" id="telefoon-hulp">Handig als we snel iets willen verduidelijken.</p>
+        <p class="veld__fout" id="telefoon-fout" hidden></p>
+      </div>
+      <div class="veld">
+        <label for="gemeente">Gemeente of postcode van het project <span aria-hidden="true">*</span></label>
+        <input id="gemeente" name="gemeente" type="text" autocomplete="address-level2" required maxlength="80" />
+        <p class="veld__fout" id="gemeente-fout" hidden></p>
+      </div>
+    </div>
+    <div class="veld">
+      <span class="veld__label" id="klant-label">U bent <span class="veld__opt">(optioneel)</span></span>
+      <div class="keuzes" role="radiogroup" aria-labelledby="klant-label" data-klanttype>
+        {
+          KLANTTYPE.map((k) => (
+            <label class="keuze">
+              <input type="radio" name="klanttype" value={k} />
+              <span>{k}</span>
+            </label>
+          ))
+        }
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="of__groep">
+    <legend>Uw project</legend>
+    <div class="of__rij of__rij--2">
+      <div class="veld">
+        <label for="type">Type werken <span aria-hidden="true">*</span></label>
+        <div class="select">
+          <select id="type" name="type" required data-type-select>
+            <option value="">Kies een type werken</option>
+            {typeWerken.map((t) => <option value={t}>{t}</option>)}
+          </select>
+        </div>
+        <p class="veld__fout" id="type-fout" hidden></p>
+      </div>
+      <div class="veld">
+        <label for="timing">Gewenste timing <span class="veld__opt">(optioneel)</span></label>
+        <div class="select">
+          <select id="timing" name="timing">
+            <option value="">Geen voorkeur</option>
+            {TIMING.map((t) => <option value={t}>{t}</option>)}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="veld">
+      <label for="beschrijving">Beschrijving van uw project <span aria-hidden="true">*</span></label>
+      <textarea
+        id="beschrijving"
+        name="beschrijving"
+        rows="6"
+        required
+        minlength={REGELS.minBeschrijving}
+        maxlength={REGELS.maxBeschrijving}
+        aria-describedby="beschrijving-hulp"></textarea>
+      <p class="veld__hulp" id="beschrijving-hulp">
+        Bijvoorbeeld: welke ruimtes, de geschatte oppervlakte, de huidige toestand en wat u wilt bereiken.
+      </p>
+      <p class="veld__fout" id="beschrijving-fout" hidden></p>
+    </div>
+
+    <div class="veld">
+      <span class="veld__label" id="fotos-label">Foto's <span class="veld__opt">(optioneel)</span></span>
+      <div class="upload" data-upload>
+        <input
+          id="fotos"
+          name="fotos"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+          multiple
+          class="upload__input"
+          aria-labelledby="fotos-label fotos-knop"
+          aria-describedby="fotos-hulp"
+          data-fotos
+        />
+        <label for="fotos" class="upload__knop" id="fotos-knop">Foto's toevoegen</label>
+        <p class="veld__hulp" id="fotos-hulp">
+          Maximaal {REGELS.maxFotos} foto's in JPG, PNG, WebP of HEIC. Grote foto's worden vóór verzending automatisch verkleind.
+        </p>
+        <ul class="upload__lijst" data-fotolijst aria-live="polite"></ul>
+      </div>
+      <p class="veld__fout" id="fotos-fout" hidden></p>
+    </div>
+  </fieldset>
+
+  <!-- Antispam: dit veld blijft leeg bij echte bezoekers -->
+  <div class="of__hp" aria-hidden="true">
+    <label for="website">Laat dit veld leeg</label>
+    <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+  <input type="hidden" name="gestart" value="" data-gestart />
+
+  <p class="of__privacy zacht">
+    We gebruiken uw gegevens en foto's enkel om uw aanvraag te beantwoorden en een offerte op te maken. Meer informatie
+    leest u in onze <a href="/privacyverklaring/">privacyverklaring</a>.
+  </p>
+
+  <div class="of__verzend">
+    <button type="submit" class="knop of__knop" data-verzendknop>
+      <span data-knoptekst>Offerteaanvraag versturen</span>
+      <span class="of__spinner" aria-hidden="true"></span>
+    </button>
+    <p class="of__status" role="status" aria-live="polite" data-status></p>
+  </div>
+
+  <div class="of__melding of__melding--fout" role="alert" hidden data-serverfout></div>
+</form>
+
+<div class="of__bevestiging" hidden tabindex="-1" data-bevestiging>
+  <span class="lijn" aria-hidden="true"></span>
+  <h3>Bedankt, uw aanvraag is verzonden.</h3>
+  <p>
+    We hebben uw offerteaanvraag goed ontvangen en nemen contact met u op om uw project te bespreken.
+  </p>
+  <p class="zacht" data-bevestiging-fotos></p>
+</div>
+
+<script>
+  import { REGELS, isGeldigEmail, isGeldigTelefoon } from '../lib/offerte-regels';
+
+  const form = document.querySelector<HTMLFormElement>('[data-offerte]');
+  if (form) init(form);
+
+  function init(form: HTMLFormElement) {
+    const gestart = form.querySelector<HTMLInputElement>('[data-gestart]')!;
+    gestart.value = String(Date.now());
+
+    // Type werken voorselecteren via ?type=
+    const params = new URLSearchParams(location.search);
+    const typeParam = params.get('type');
+    const select = form.querySelector<HTMLSelectElement>('[data-type-select]')!;
+    if (typeParam && [...select.options].some((o) => o.value === typeParam)) select.value = typeParam;
+    if (params.get('klant') === 'professioneel') {
+      const r = form.querySelector<HTMLInputElement>('input[name="klanttype"][value="Bedrijf"]');
+      if (r) r.checked = true;
+    }
+
+    // ── Foto's ─────────────────────────────────────────
+    const fotoInput = form.querySelector<HTMLInputElement>('[data-fotos]')!;
+    const fotoLijst = form.querySelector<HTMLUListElement>('[data-fotolijst]')!;
+    let fotos: File[] = [];
+
+    fotoInput.addEventListener('change', async () => {
+      const nieuw = [...(fotoInput.files ?? [])];
+      fotoInput.value = '';
+      zetFout('fotos', '');
+      const ruimte = REGELS.maxFotos - fotos.length;
+      if (nieuw.length > ruimte) {
+        zetFout('fotos', `U kunt maximaal ${REGELS.maxFotos} foto's toevoegen. ${ruimte > 0 ? `Er is nog plaats voor ${ruimte}.` : ''}`);
+      }
+      for (const f of nieuw.slice(0, Math.max(0, ruimte))) {
+        const isBeeld = (REGELS.toegelatenTypes as readonly string[]).includes(f.type) || /\.(heic|heif)$/i.test(f.name);
+        if (!isBeeld) {
+          zetFout('fotos', `"${f.name}" is geen ondersteund beeldformaat. Gebruik JPG, PNG, WebP of HEIC.`);
+          continue;
+        }
+        fotos.push(await verklein(f));
+      }
+      if (totaal() > REGELS.maxBytesTotaal) {
+        zetFout('fotos', `De foto's zijn samen te groot (max. ${mb(REGELS.maxBytesTotaal)}). Verwijder er één of meer.`);
+      }
+      tekenLijst();
+    });
+
+    function totaal() {
+      return fotos.reduce((s, f) => s + f.size, 0);
+    }
+
+    function tekenLijst() {
+      fotoLijst.innerHTML = '';
+      fotos.forEach((f, i) => {
+        const li = document.createElement('li');
+        const naam = document.createElement('span');
+        naam.textContent = `${f.name} (${mb(f.size)})`;
+        const weg = document.createElement('button');
+        weg.type = 'button';
+        weg.textContent = 'Verwijderen';
+        weg.setAttribute('aria-label', `${f.name} verwijderen`);
+        weg.addEventListener('click', () => {
+          fotos.splice(i, 1);
+          zetFout('fotos', '');
+          tekenLijst();
+          fotoInput.focus();
+        });
+        li.append(naam, weg);
+        fotoLijst.append(li);
+      });
+    }
+
+    async function verklein(f: File): Promise<File> {
+      try {
+        const bmp = await createImageBitmap(f);
+        const schaal = Math.min(1, REGELS.maxPixels / Math.max(bmp.width, bmp.height));
+        if (schaal === 1 && f.size <= 1.2 * 1024 * 1024 && f.type !== 'image/heic' && f.type !== 'image/heif') return f;
+        const c = document.createElement('canvas');
+        c.width = Math.round(bmp.width * schaal);
+        c.height = Math.round(bmp.height * schaal);
+        c.getContext('2d')!.drawImage(bmp, 0, 0, c.width, c.height);
+        const blob = await new Promise<Blob | null>((r) => c.toBlob(r, 'image/jpeg', 0.82));
+        if (!blob) return f;
+        return new File([blob], f.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+      } catch {
+        // Browser kan dit formaat niet lezen (bv. HEIC buiten Safari): origineel behouden
+        return f;
+      }
+    }
+
+    // ── Validatie ──────────────────────────────────────
+    const velden: Record<string, (v: string) => string> = {
+      naam: (v) => (v.trim().length < 2 ? 'Vul uw naam in.' : ''),
+      email: (v) => (!v.trim() ? 'Vul uw e-mailadres in.' : !isGeldigEmail(v) ? 'Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.be.' : ''),
+      telefoon: (v) => (v.trim() && !isGeldigTelefoon(v) ? 'Vul een geldig telefoonnummer in, bijvoorbeeld 0470 12 34 56.' : ''),
+      gemeente: (v) => (v.trim().length < 2 ? 'Vul de gemeente of postcode van het project in.' : ''),
+      type: (v) => (!v ? 'Kies het type werken.' : ''),
+      beschrijving: (v) =>
+        v.trim().length < REGELS.minBeschrijving
+          ? `Beschrijf uw project in minstens ${REGELS.minBeschrijving} tekens.`
+          : '',
+    };
+    const labels: Record<string, string> = {
+      naam: 'Naam',
+      email: 'E-mailadres',
+      telefoon: 'Telefoonnummer',
+      gemeente: 'Gemeente of postcode',
+      type: 'Type werken',
+      beschrijving: 'Beschrijving',
+      fotos: "Foto's",
+    };
+
+    function zetFout(naam: string, tekst: string) {
+      const el = form.querySelector<HTMLElement>(`#${naam}-fout`);
+      const input = form.querySelector<HTMLElement>(`#${naam}`);
+      if (el) {
+        el.textContent = tekst;
+        el.hidden = !tekst;
+      }
+      if (input) {
+        if (tekst) {
+          input.setAttribute('aria-invalid', 'true');
+          const besch = new Set((input.getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean));
+          besch.add(`${naam}-fout`);
+          input.setAttribute('aria-describedby', [...besch].join(' '));
+        } else {
+          input.removeAttribute('aria-invalid');
+        }
+      }
+    }
+
+    function controleer(naam: string) {
+      const el = form.elements.namedItem(naam) as HTMLInputElement | null;
+      if (!el || !velden[naam]) return '';
+      const fout = velden[naam](el.value);
+      zetFout(naam, fout);
+      return fout;
+    }
+
+    Object.keys(velden).forEach((naam) => {
+      const el = form.elements.namedItem(naam) as HTMLInputElement | null;
+      el?.addEventListener('blur', () => {
+        if (el.value || el.getAttribute('aria-invalid')) controleer(naam);
+      });
+      el?.addEventListener('input', () => {
+        if (el.getAttribute('aria-invalid')) controleer(naam);
+      });
+    });
+
+    // ── Verzenden ──────────────────────────────────────
+    const foutlijst = form.querySelector<HTMLElement>('[data-foutlijst]')!;
+    const knop = form.querySelector<HTMLButtonElement>('[data-verzendknop]')!;
+    const knopTekst = form.querySelector<HTMLElement>('[data-knoptekst]')!;
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const serverFout = form.querySelector<HTMLElement>('[data-serverfout]')!;
+    const bevestiging = document.querySelector<HTMLElement>('[data-bevestiging]')!;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      serverFout.hidden = true;
+
+      const fouten = Object.keys(velden)
+        .map((n) => [n, controleer(n)] as const)
+        .filter(([, f]) => f);
+      if (totaal() > REGELS.maxBytesTotaal) fouten.push(['fotos', `De foto's zijn samen te groot (max. ${mb(REGELS.maxBytesTotaal)}).`]);
+
+      if (fouten.length) {
+        const ul = foutlijst.querySelector('ul')!;
+        ul.innerHTML = '';
+        fouten.forEach(([n, f]) => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${n}`;
+          a.textContent = `${labels[n]}: ${f}`;
+          a.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            (form.querySelector(`#${n}`) as HTMLElement | null)?.focus();
+          });
+          li.append(a);
+          ul.append(li);
+        });
+        foutlijst.hidden = false;
+        foutlijst.focus();
+        return;
+      }
+      foutlijst.hidden = true;
+
+      const data = new FormData(form);
+      data.delete('fotos');
+      fotos.forEach((f) => data.append('fotos', f, f.name));
+
+      knop.disabled = true;
+      knop.classList.add('is-bezig');
+      knopTekst.textContent = 'Bezig met verzenden…';
+      status.textContent = 'Uw aanvraag wordt verzonden.';
+
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        const json = await res.json().catch(() => null);
+        if (!res.ok || !json?.ok) {
+          throw new Error(json?.fout || 'Er ging iets mis bij het verzenden. Probeer het later opnieuw.');
+        }
+        form.hidden = true;
+        const fotoTekst = bevestiging.querySelector<HTMLElement>('[data-bevestiging-fotos]')!;
+        fotoTekst.textContent = fotos.length ? `Met ${fotos.length} foto${fotos.length > 1 ? "'s" : ''} als bijlage.` : '';
+        bevestiging.hidden = false;
+        bevestiging.focus();
+        bevestiging.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch (err) {
+        const bericht =
+          err instanceof TypeError
+            ? 'Het formulier kon de server niet bereiken. Controleer uw internetverbinding of probeer het later opnieuw.'
+            : (err as Error).message;
+        serverFout.innerHTML = '';
+        const p = document.createElement('p');
+        const s = document.createElement('strong');
+        s.textContent = 'Uw aanvraag is niet verzonden. ';
+        p.append(s, document.createTextNode(bericht));
+        serverFout.append(p);
+        serverFout.hidden = false;
+        status.textContent = '';
+        serverFout.focus?.();
+      } finally {
+        knop.disabled = false;
+        knop.classList.remove('is-bezig');
+        knopTekst.textContent = 'Offerteaanvraag versturen';
+      }
+    });
+  }
+
+  function mb(b: number) {
+    return b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1).replace('.', ',')} MB` : `${Math.max(1, Math.round(b / 1024))} kB`;
+  }
+</script>
+
+<style>
+  .of {
+    display: grid;
+    gap: 2.25rem;
+  }
+  .of__uitleg {
+    margin: 0;
+    font-size: var(--fs-0);
+  }
+  .of__groep {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+  legend {
+    padding: 0;
+    margin-bottom: 1.25rem;
+    font-size: var(--fs-3);
+    font-weight: 500;
+    font-stretch: var(--breed);
+    width: 100%;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--steen-licht);
+  }
+  .of__rij {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .of__rij--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .veld {
+    display: grid;
+    gap: 0.45rem;
+    align-content: start;
+    min-width: 0;
+  }
+  .veld label,
+  .veld__label {
+    font-size: var(--fs-1);
+    font-weight: 520;
+  }
+  .veld__opt {
+    font-weight: 400;
+    color: var(--steen-donker);
+  }
+  input[type='text'],
+  input[type='email'],
+  input[type='tel'],
+  select,
+  textarea {
+    width: 100%;
+    min-height: 3.1rem;
+    padding: 0.75rem 0.9rem;
+    font: inherit;
+    font-size: 1rem; /* voorkomt inzoomen op iOS */
+    color: var(--antraciet);
+    background: var(--wit);
+    border: 1px solid var(--rand-veld);
+    border-radius: var(--radius);
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  }
+  textarea {
+    resize: vertical;
+    min-height: 9rem;
+    line-height: 1.5;
+  }
+  input:hover,
+  select:hover,
+  textarea:hover {
+    border-color: var(--antraciet);
+  }
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+    border-color: var(--antraciet);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brons) 35%, transparent);
+  }
+  [aria-invalid='true'] {
+    border-color: var(--fout) !important;
+  }
+  .select {
+    position: relative;
+  }
+  .select::after {
+    content: '';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+  select {
+    appearance: none;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+  .veld__hulp {
+    margin: 0;
+    font-size: var(--fs-0);
+    color: var(--steen-donker);
+  }
+  .veld__fout {
+    margin: 0;
+    font-size: var(--fs-0);
+    font-weight: 520;
+    color: var(--fout);
+  }
+  .keuzes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .keuze {
+    position: relative;
+    font-weight: 400 !important;
+  }
+  .keuze input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .keuze span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--rand-veld);
+    border-radius: 99px;
+    background: var(--wit);
+    transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .keuze input:checked + span {
+    background: var(--antraciet);
+    border-color: var(--antraciet);
+    color: var(--kalk);
+  }
+  .keuze input:focus-visible + span {
+    outline: 2px solid var(--brons);
+    outline-offset: 3px;
+  }
+  .upload {
+    display: grid;
+    gap: 0.6rem;
+    justify-items: start;
+    padding: 1.25rem;
+    border: 1px dashed var(--rand-veld);
+    border-radius: var(--radius);
+    background: var(--wit);
+  }
+  .upload__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+  }
+  .upload__knop {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid var(--antraciet);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 540 !important;
+    transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .upload__knop:hover {
+    background: var(--antraciet);
+    color: var(--kalk);
+  }
+  .upload__input:focus-visible + .upload__knop {
+    outline: 2px solid var(--brons);
+    outline-offset: 3px;
+  }
+  .upload__lijst {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    font-size: var(--fs-1);
+  }
+  .upload__lijst :global(li) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--steen-licht);
+    word-break: break-all;
+  }
+  .upload__lijst :global(button) {
+    flex: none;
+    min-height: 2.5rem;
+    padding: 0 0.25rem;
+    background: none;
+    border: 0;
+    font: inherit;
+    font-size: var(--fs-0);
+    color: var(--fout);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+  .of__hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .of__privacy {
+    margin: 0;
+    font-size: var(--fs-0);
+    max-width: 40rem;
+  }
+  .of__verzend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+  }
+  .of__knop {
+    min-width: 16rem;
+  }
+  .of__knop:disabled {
+    cursor: progress;
+    opacity: 0.85;
+  }
+  .of__spinner {
+    display: none;
+    width: 1rem;
+    height: 1rem;
+    border: 1.5px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: draai 0.8s linear infinite;
+  }
+  .is-bezig .of__spinner {
+    display: inline-block;
+  }
+  @keyframes draai {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .of__status {
+    margin: 0;
+    font-size: var(--fs-1);
+    color: var(--steen-donker);
+  }
+  .of__melding,
+  .of__foutlijst {
+    padding: 1rem 1.25rem;
+    border-left: 3px solid var(--fout);
+    background: color-mix(in srgb, var(--fout) 7%, var(--wit));
+    font-size: var(--fs-1);
+  }
+  .of__foutlijst ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.1rem;
+  }
+  .of__foutlijst a {
+    color: var(--fout);
+  }
+  .of__bevestiging {
+    padding: clamp(1.5rem, 4vw, 3rem) 0;
+  }
+  .of__bevestiging .lijn {
+    width: 6rem;
+    margin-bottom: 1.75rem;
+  }
+  .of__bevestiging h3 {
+    font-size: var(--fs-4);
+    margin-bottom: 1rem;
+    max-width: 18ch;
+  }
+  @media (max-width: 640px) {
+    .of__rij--2 {
+      grid-template-columns: 1fr;
+    }
+    .of__knop {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+</style>

@@ -1,0 +1,57 @@
+---
+/**
+ * Logotype — voorstel van identiteit (geen officieel logo ontvangen).
+ * Werkt op licht en donker: kleur volgt `currentColor`.
+ */
+interface Props {
+  klein?: boolean;
+}
+const { klein = false } = Astro.props;
+---
+
+<span class:list={['logo', { 'logo--klein': klein }]}>
+  <span class="logo__naam">Derycke</span><span class="sr-only">&nbsp;</span><span class="logo__lijn" aria-hidden="true"></span><span class="logo__sub">Renovatie &amp; Schilderwerken</span>
+</span>
+
+<style>
+  .logo {
+    display: inline-grid;
+    grid-template-columns: max-content;
+    row-gap: 0.32rem;
+    line-height: 1;
+    color: currentColor;
+  }
+  .logo__naam {
+    font-size: 1.32rem;
+    font-weight: 620;
+    font-stretch: 125%;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    /* compenseer de spatiëring na de laatste letter */
+    margin-right: -0.24em;
+  }
+  .logo__lijn {
+    height: 1px;
+    width: 100%;
+    background: var(--brons);
+  }
+  :global(.donker) .logo__lijn {
+    background: var(--brons-licht);
+  }
+  .logo__sub {
+    font-size: 0.6rem;
+    font-weight: 480;
+    font-stretch: 112%;
+    letter-spacing: 0.085em;
+    white-space: nowrap;
+    /* uitvullen onder het woordbeeld */
+    text-align: justify;
+    text-align-last: justify;
+  }
+  .logo--klein .logo__naam {
+    font-size: 1.12rem;
+  }
+  .logo--klein .logo__sub {
+    font-size: 0.54rem;
+  }
+</style>

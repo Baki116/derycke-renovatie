@@ -1,0 +1,86 @@
+# ─────────────────────────────────────────────────────────────
+#  Beheeromgeving (Sveltia CMS) — https://www.derycke.be/admin/
+#  Toegang: enkel GitHub-gebruikers met schrijfrechten op de repository.
+#  Zie README.md, hoofdstuk "Beheer van realisaties", voor de installatie.
+# ─────────────────────────────────────────────────────────────
+backend:
+  name: github
+  repo: GITHUB-ACCOUNT/derycke-website # ← aan te passen na het aanmaken van de repository
+  branch: main
+  # base_url: https://<uw-auth-worker>.workers.dev  # optioneel: aanmelden via "Inloggen met GitHub"
+
+locale: nl
+site_url: /
+display_url: /
+logo_url: /favicon.svg
+
+media_folder: src/assets/realisaties
+public_folder: ../../assets/realisaties
+
+collections:
+  - name: realisaties
+    label: Realisaties
+    label_singular: Realisatie
+    description: >-
+      Voeg hier uw projecten toe. Zet "Status" op "Gepubliceerd" om een project op de site te tonen.
+      Vermeld de gemeente enkel als de klant daarmee akkoord gaat.
+    folder: src/content/realisaties
+    path: '{{slug}}/index'
+    media_folder: ''
+    public_folder: ''
+    create: true
+    delete: true
+    slug: '{{titel}}'
+    identifier_field: titel
+    summary: '{{titel}} ({{typeWerken}}, {{status}})'
+    sortable_fields: [datum, titel, typeWerken]
+    view_filters:
+      - { label: Gepubliceerd, field: status, pattern: gepubliceerd }
+      - { label: Concept, field: status, pattern: concept }
+      - { label: Echte realisaties, field: inspiratie, pattern: false }
+    fields:
+      - { label: Titel, name: titel, widget: string, hint: 'Bijvoorbeeld: Badkamer met inloopdouche' }
+      - label: Type werken
+        name: typeWerken
+        widget: select
+        options: [Schilderwerken, Badkamerrenovaties, Keukenrenovaties, Vloerwerken, Algemene renovaties]
+      - { label: Gemeente, name: gemeente, widget: string, required: false, hint: 'Alleen invullen met toestemming van de klant.' }
+      - { label: Korte samenvatting, name: samenvatting, widget: text, hint: 'Eén of twee zinnen, maximaal 220 tekens.', pattern: ['^[\s\S]{1,220}$', 'Maximaal 220 tekens'] }
+      - { label: Hoofdfoto, name: hoofdfoto, widget: image, choose_url: false }
+      - { label: Beschrijving hoofdfoto (alt-tekst), name: hoofdfotoAlt, widget: string, hint: 'Beschrijf wat er op de foto te zien is, voor wie de foto niet kan zien.' }
+      - label: Fotogalerij
+        name: galerij
+        widget: list
+        required: false
+        collapsed: false
+        summary: '{{fields.alt}}'
+        fields:
+          - { label: Foto, name: foto, widget: image, choose_url: false }
+          - { label: Beschrijving (alt-tekst), name: alt, widget: string }
+      - label: Status
+        name: status
+        widget: select
+        default: concept
+        options:
+          - { label: Concept (niet zichtbaar), value: concept }
+          - { label: Gepubliceerd, value: gepubliceerd }
+      - { label: Inspiratiebeeld (geen eigen project), name: inspiratie, widget: boolean, default: false, hint: 'Laat uit voor echte realisaties van Derycke.' }
+      - { label: Datum, name: datum, widget: datetime, time_format: false, date_format: 'DD-MM-YYYY', format: 'YYYY-MM-DD' }
+      - { label: Verhaal van het project, name: body, widget: markdown, required: false, buttons: [bold, italic, link, bulleted-list], editor_components: [] }
+
+  - name: instellingen
+    label: Instellingen
+    files:
+      - name: bedrijf
+        label: Bedrijfsgegevens
+        file: src/config/bedrijf.json
+        fields:
+          - { label: 'Telefoonnummer (internationaal, bv. +32 470 12 34 56)', name: telefoon, widget: string, required: false }
+          - { label: 'Telefoonnummer zoals getoond (bv. 0470 12 34 56)', name: telefoonWeergave, widget: string, required: false }
+          - { label: E-mailadres, name: email, widget: string, required: false }
+          - { label: Straat en nummer, name: straat, widget: string, required: false }
+          - { label: Postcode, name: postcode, widget: string, required: false }
+          - { label: Gemeente, name: gemeente, widget: string, required: false }
+          - { label: 'Ondernemingsnummer (bv. BE 0123.456.789)', name: ondernemingsnummer, widget: string, required: false }
+          - { label: 'Rechtsvorm (bv. BV)', name: rechtsvorm, widget: string, required: false }
+          - { label: Contactpersoon privacy, name: privacyContact, widget: string, required: false }
