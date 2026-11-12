@@ -82,6 +82,14 @@ const alleSchema = [bedrijf, ...schema];
   </head>
   <body>
     <a class="skiplink" href="#inhoud">Naar de inhoud</a>
+    {
+      site.demo && (
+        <p class="voorbeeldband">
+          Voorbeeldversie: een eerste ontwerp om de richting te tonen. De definitieve website wordt afgewerkt met uw eigen
+          foto's, logo en gegevens.
+        </p>
+      )
+    }
     <Header />
     <main id="inhoud" tabindex="-1">
       <slot />

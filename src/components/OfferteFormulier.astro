@@ -355,6 +355,19 @@ const fout = Astro.url.searchParams.get('fout');
       }
       foutlijst.hidden = true;
 
+      // Statische voorbeeldversie (zonder server): duidelijk melden dat er niets verzonden wordt
+      if (form.hasAttribute('data-voorbeeld')) {
+        serverFout.innerHTML = '';
+        const p = document.createElement('p');
+        const s = document.createElement('strong');
+        s.textContent = 'Voorbeeldversie: er werd niets verzonden. ';
+        p.append(s, document.createTextNode('Het formulier werkt correct. In de definitieve website komt uw aanvraag rechtstreeks in uw mailbox terecht.'));
+        serverFout.append(p);
+        serverFout.classList.add('of__melding--info');
+        serverFout.hidden = false;
+        return;
+      }
+
       const data = new FormData(form);
       data.delete('fotos');
       fotos.forEach((f) => data.append('fotos', f, f.name));
@@ -671,6 +684,10 @@ const fout = Astro.url.searchParams.get('fout');
     border-left: 3px solid var(--fout);
     background: color-mix(in srgb, var(--fout) 7%, var(--wit));
     font-size: var(--fs-1);
+  }
+  .of__melding--info {
+    border-left-color: var(--brons);
+    background: var(--wit);
   }
   .of__foutlijst ul {
     margin: 0.5rem 0 0;

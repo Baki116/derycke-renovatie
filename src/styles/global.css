@@ -373,6 +373,17 @@ a:hover {
   background: var(--brons-licht);
 }
 
+/* ── Voorbeeldband (enkel demoversie) ── */
+.voorbeeldband {
+  margin: 0;
+  padding: 0.55rem var(--gutter);
+  background: var(--antraciet);
+  color: #e6e4de;
+  font-size: var(--fs-0);
+  line-height: 1.45;
+  text-align: center;
+}
+
 /* ── Demo-melding ──────────────────────────────────────────── */
 
 .demo-melding {
