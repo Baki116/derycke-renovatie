@@ -10,7 +10,7 @@ import leefkeuken from '../../assets/beelden/leefkeuken.jpg';
 ---
 
 <Basis
-  titel="Onze diensten: renovatie- en schilderwerken"
+  titel="Renovatie- en schilderwerken in Vlaanderen"
   omschrijving="Schilderwerken, badkamerrenovaties, keukenrenovaties, vloerwerken en algemene renovaties in heel Vlaanderen. Ontdek wat Derycke voor uw woning of pand kan doen."
   schema={[kruimelSchema(Astro.site, [{ naam: 'Diensten', href: '/diensten/' }])]}
 >
@@ -23,11 +23,12 @@ import leefkeuken from '../../assets/beelden/leefkeuken.jpg';
   <div class="wrap overzicht">
     {
       diensten.map((d, i) => (
-        <article class:list={['rij', { 'rij--om': i % 2 === 1 }]} aria-labelledby={`d-${d.slug}`}>
+        <article class:list={['rij', 'zoom-hover', { 'rij--om': i % 2 === 1 }]} aria-labelledby={`d-${d.slug}`} data-reveal>
           <a href={`/diensten/${d.slug}/`} class="rij__beeldlink" tabindex="-1" aria-hidden="true">
             <Foto src={d.beeld.src} alt="" sizes="(min-width: 900px) 44vw, 100vw" widths={[600, 900, 1300]} ratio="4 / 3" />
           </a>
           <div class="rij__tekst">
+            <p class="nr">{String(i + 1).padStart(2, '0')}</p>
             <h2 id={`d-${d.slug}`}>
               <a href={`/diensten/${d.slug}/`}>{d.titel}</a>
             </h2>

@@ -1,12 +1,10 @@
 ---
 import '../styles/global.css';
-import { getImage } from 'astro:assets';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ContactKnoppen from '../components/ContactKnoppen.astro';
 import { site, isProductie } from '../config/site';
 import { diensten } from '../data/diensten';
-import ogBron from '../assets/beelden/hero-woonkamer.jpg';
 
 interface Props {
   titel: string;
@@ -26,8 +24,7 @@ const volledigeTitel = titel.includes('Derycke') ? titel : `${titel} | Derycke R
 const canoniek = new URL(Astro.url.pathname, site.domein).href;
 const robots = !isProductie || noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large';
 
-const og = await getImage({ src: ogBron, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 78 });
-const ogUrl = new URL(og.src, site.domein).href;
+const ogUrl = `${site.domein}/og-derycke.jpg`;
 const logoUrl = new URL('/logo/derycke-logo-donker.svg', site.domein).href;
 
 // Gestructureerde data: enkel bevestigde gegevens.

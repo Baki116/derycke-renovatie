@@ -5,7 +5,7 @@
 # ─────────────────────────────────────────────────────────────
 backend:
   name: github
-  repo: GITHUB-ACCOUNT/derycke-website # ← aan te passen na het aanmaken van de repository
+  repo: Baki116/derycke-renovatie # ← aan te passen na het aanmaken van de repository
   branch: main
   # base_url: https://<uw-auth-worker>.workers.dev  # optioneel: aanmelden via "Inloggen met GitHub"
 

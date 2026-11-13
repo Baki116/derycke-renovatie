@@ -37,7 +37,7 @@ export const diensten: Dienst[] = [
     slug: 'schilderwerken',
     titel: 'Schilderwerken',
     kort: 'Binnen- en buitenschilderwerken, lakwerken en een strakke afwerking.',
-    seoTitel: 'Schilderwerken binnen en buiten in heel Vlaanderen',
+    seoTitel: 'Schilderwerken in Vlaanderen',
     seoOmschrijving:
       'Professionele binnen- en buitenschilderwerken, lakwerken en afwerking in heel Vlaanderen. Vraag uw vrijblijvende offerte aan bij Derycke.',
     intro:
@@ -97,7 +97,7 @@ export const diensten: Dienst[] = [
     slug: 'badkamerrenovaties',
     titel: 'Badkamerrenovaties',
     kort: 'Volledige renovaties, sanitair, douches en tegelwerken.',
-    seoTitel: 'Badkamerrenovatie in heel Vlaanderen',
+    seoTitel: 'Badkamerrenovatie in Vlaanderen',
     seoOmschrijving:
       'Volledige badkamerrenovatie: sanitair, inloopdouches en tegelwerken met oog voor detail. Actief in heel Vlaanderen. Vraag uw offerte aan.',
     intro:
@@ -157,7 +157,7 @@ export const diensten: Dienst[] = [
     slug: 'keukenrenovaties',
     titel: 'Keukenrenovaties',
     kort: 'Vernieuwing en modernisering van keukens.',
-    seoTitel: 'Keukenrenovatie en modernisering in Vlaanderen',
+    seoTitel: 'Keukenrenovatie in Vlaanderen',
     seoOmschrijving:
       'Uw keuken vernieuwen of moderniseren? Derycke verzorgt keukenrenovaties en de afwerking errond in heel Vlaanderen. Vraag uw vrijblijvende offerte aan.',
     intro:
@@ -212,7 +212,7 @@ export const diensten: Dienst[] = [
     slug: 'vloerwerken',
     titel: 'Vloerwerken',
     kort: 'Tegels, parket, laminaat, vinyl en PVC.',
-    seoTitel: 'Vloerwerken: tegels, parket, laminaat, vinyl en PVC',
+    seoTitel: 'Vloerwerken in Vlaanderen',
     seoOmschrijving:
       'Plaatsing van tegelvloeren, parket, laminaat, vinyl en PVC in heel Vlaanderen. Vakkundig gelegd met aandacht voor plinten en aansluitingen.',
     intro:
@@ -260,7 +260,7 @@ export const diensten: Dienst[] = [
     slug: 'algemene-renovaties',
     titel: 'Algemene renovaties',
     kort: 'Gyprocwerken, pleisterwerken en interieurafwerking.',
-    seoTitel: 'Algemene renovaties: gyproc, pleisterwerk en interieurafwerking',
+    seoTitel: 'Algemene renovaties in Vlaanderen',
     seoOmschrijving:
       'Gyprocwerken, pleisterwerken en interieurafwerking voor particulieren en bedrijven in heel Vlaanderen. Vraag uw vrijblijvende offerte aan bij Derycke.',
     intro:
