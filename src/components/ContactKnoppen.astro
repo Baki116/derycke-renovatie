@@ -108,6 +108,11 @@ const offerte = dienst ? `/contact/?dienst=${encodeURIComponent(dienst)}#offerte
   .mbalk {
     display: none;
   }
+  /* verbergen zolang het mobiele menu of de assistent open is */
+  :global(html[data-scroll-stop]) .zweef,
+  :global(html[data-scroll-stop]) .mbalk {
+    visibility: hidden;
+  }
 
   @media (max-width: 960px) {
     .zweef {
