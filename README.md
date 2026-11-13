@@ -87,7 +87,7 @@ Aucun secret dans le code. Sans `RESEND_API_KEY`, `OFFERTE_TO` et `OFFERTE_FROM`
 
 ## Indexation
 
-Le site n'est indexable qu'en **production** (`VERCEL_ENV=production`). Les previews `*.vercel.app` sont toujours en `noindex` et leur `robots.txt` bloque tout.
+Le site n'est indexable que si la variable **`INDEXEERBAAR=1`** est définie (à ajouter dans Vercel, environnement Production, le jour où le domaine est branché). Sans elle, toutes les pages sont en `noindex` et `robots.txt` bloque tout, y compris sur `*.vercel.app`.
 Domaine canonique : `https://deryckerenovatie.be` (sans www). `www` est redirigé en 301 vers l'apex (`vercel.json`).
 
 ## Formulaire et assistant

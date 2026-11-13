@@ -52,8 +52,11 @@ export const site = {
   antwoordtermijn: 'binnen 1 werkdag',
 } as const;
 
-/** Productie = gekoppeld domein. Previews (vercel.app) worden nooit geïndexeerd. */
-export const isProductie = process.env.VERCEL_ENV === 'production' || process.env.INDEXEERBAAR === '1';
+/**
+ * Indexeren door Google: enkel als INDEXEERBAAR=1 (Vercel, omgeving Production) én het domein gekoppeld is.
+ * Zonder die variabele krijgt elke versie noindex en blokkeert robots.txt alles.
+ */
+export const isProductie = process.env.INDEXEERBAAR === '1';
 
 export const telLink = site.contact.telefoon ? `tel:${site.contact.telefoon}` : null;
 
