@@ -2,7 +2,7 @@
 
 | Date | Projet | Quoi | Preview | Statut |
 | --- | --- | --- | --- | --- |
-| 13/11/2026 | Derycke Renovatie & Schilderwerken | Refonte complète, version finale (11 pages NL) | voir rapport de mission | À auditer par Codex |
+| 13/11/2026 | Derycke Renovatie & Schilderwerken | Refonte complète, version finale (11 pages NL) | https://derycke-renovatie.vercel.app | À auditer par Codex |
 
 ## Points à vérifier (Derycke)
 
