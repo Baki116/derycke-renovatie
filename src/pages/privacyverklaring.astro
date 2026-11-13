@@ -1,103 +1,90 @@
 ---
 import Basis from '../layouts/Basis.astro';
 import PaginaKop from '../components/PaginaKop.astro';
-import { site, ontbreekt } from '../config/site';
+import { site, telLink } from '../config/site';
 import { kruimelSchema } from '../lib/schema';
 
 const { contact, adres, onderneming } = site;
 const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolean).join(' ')].filter(Boolean).join(', ');
-const leeg = (v: string | null) => v ?? `[${ontbreekt}]`;
+const bijgewerkt = '13 november 2026';
 ---
-
 <Basis
   titel="Privacyverklaring"
-  omschrijving="Hoe Derycke Renovatie & Schilderwerken omgaat met de persoonsgegevens die u via de website en het offerteformulier bezorgt."
+  omschrijving="Hoe Derycke Renovatie & Schilderwerken omgaat met de persoonsgegevens die u via het offerteformulier, de assistent of WhatsApp bezorgt."
   schema={[kruimelSchema(Astro.site, [{ naam: 'Privacyverklaring', href: '/privacyverklaring/' }])]}
 >
-  <PaginaKop titel="Privacyverklaring" kruimels={[{ naam: 'Privacyverklaring' }]}>
-    {
-      site.demo && (
-        <p class="demo-melding concept">
-          Basisversie ter voorbereiding, niet juridisch gevalideerd. De gegevens tussen vierkante haken moeten vóór
-          publicatie ingevuld worden, en de tekst kan best nagelezen worden door een jurist of adviseur.
-        </p>
-      )
-    }
-  </PaginaKop>
+  <PaginaKop titel="Privacyverklaring" intro={`Laatst bijgewerkt op ${bijgewerkt}.`} kruimels={[{ naam: 'Privacyverklaring' }]} />
 
   <article class="wrap tekst">
-    <p class="zacht">Laatst bijgewerkt: [datum van publicatie]</p>
-
     <h2>1. Wie is verantwoordelijk voor uw gegevens?</h2>
     <p>
-      De verwerkingsverantwoordelijke is {site.naam}{onderneming.rechtsvorm ? ` ${onderneming.rechtsvorm}` : ''},
-      met ondernemingsnummer {leeg(onderneming.ondernemingsnummer)}, gevestigd te {adresRegel || `[${ontbreekt}]`}.
+      De verwerkingsverantwoordelijke is {site.naam}, btw {onderneming.ondernemingsnummer}, {adresRegel}.
     </p>
     <p>
-      Voor vragen over uw gegevens kunt u terecht bij {leeg(site.privacyContact)}, via
-      {contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : ` [${ontbreekt}]`}{contact.telefoon ? ` of ${contact.telefoon}` : ''}.
+      Vragen over uw gegevens kunt u stellen via <a href={`mailto:${contact.email}`}>{contact.email}</a> of
+      telefonisch op <a href={telLink}>{contact.telefoonWeergave}</a>.
     </p>
 
-    <h2>2. Welke gegevens verwerken we?</h2>
-    <p>Wanneer u het offerteformulier invult, verwerken we:</p>
-    <ul>
-      <li>uw naam, e-mailadres en, als u dat invult, uw telefoonnummer;</li>
-      <li>de gemeente of postcode van het project;</li>
-      <li>of u particulier, bedrijf of vastgoedprofessional bent, als u dat aanduidt;</li>
-      <li>het type werken, de gewenste timing en de beschrijving van uw project;</li>
-      <li>de foto's die u meestuurt. Foto's kunnen persoonlijke elementen tonen; we vragen u enkel beelden van de betrokken ruimtes te sturen.</li>
-    </ul>
-    <p>
-      Bij elk bezoek aan de website registreert de hostingpartner technische gegevens zoals uw IP-adres en het tijdstip
-      van de aanvraag. Die gegevens dienen voor de beveiliging en de goede werking van de website.
-    </p>
-
-    <h2>3. Waarom en op welke basis?</h2>
+    <h2>2. Welke gegevens verzamelen we?</h2>
+    <p>Enkel de gegevens die u zelf bezorgt:</p>
     <ul>
       <li>
-        <strong>Uw aanvraag beantwoorden en een offerte opmaken.</strong> Rechtsgrond: maatregelen die op uw verzoek
-        genomen worden vóór het sluiten van een overeenkomst (art. 6.1.b AVG).
+        <strong>Via het offerteformulier en de Derycke-assistent:</strong> uw naam, telefoonnummer, e-mailadres, de gemeente
+        en postcode van het project, het type klant, de gewenste werken en timing, uw beschrijving en de foto's die u
+        meestuurt.
       </li>
       <li>
-        <strong>Beveiliging van de website en het voorkomen van misbruik.</strong> Rechtsgrond: ons gerechtvaardigd
-        belang (art. 6.1.f AVG).
+        <strong>Via WhatsApp:</strong> uw telefoonnummer, uw profielnaam en de berichten en foto's die u stuurt. WhatsApp is een
+        dienst van WhatsApp Ireland Ltd. (Meta), met een eigen privacybeleid.
       </li>
-    </ul>
-    <p>We gebruiken uw gegevens niet voor reclame en verkopen ze niet door.</p>
-
-    <h2>4. Met wie delen we uw gegevens?</h2>
-    <p>We doen een beroep op enkele dienstverleners die uw gegevens enkel in onze opdracht verwerken:</p>
-    <ul>
-      <li><strong>Vercel</strong>, voor de hosting van de website en de verwerking van het formulier;</li>
-      <li><strong>Resend</strong>, voor het doorsturen van uw aanvraag per e-mail naar ons;</li>
-      <li><strong>[e-mailprovider van Derycke]</strong>, waar de aanvragen in onze mailbox terechtkomen.</li>
+      <li><strong>Via e-mail of telefoon:</strong> de gegevens die u ons op die manier meedeelt.</li>
     </ul>
     <p>
-      Sommige van deze dienstverleners kunnen gegevens buiten de Europese Economische Ruimte verwerken. In dat geval
-      gebeurt dat op basis van passende waarborgen, zoals de standaardcontractbepalingen van de Europese Commissie.
-      [Te controleren bij de gekozen diensten en regio.]
+      De assistent op de website is een begeleide vragenlijst zonder kunstmatige intelligentie. Uw antwoorden worden pas
+      verstuurd wanneer u op "Aanvraag versturen" klikt. Tot dan blijven ze enkel in uw browser.
     </p>
 
-    <h2>5. Hoe lang bewaren we uw gegevens?</h2>
+    <h2>3. Waarvoor gebruiken we ze?</h2>
+    <ul>
+      <li>om uw vraag of offerteaanvraag te beantwoorden en contact met u op te nemen;</li>
+      <li>om een offerte op te maken en, als u ingaat op de offerte, de werken voor te bereiden en uit te voeren;</li>
+      <li>om te voldoen aan onze wettelijke verplichtingen, bijvoorbeeld de boekhouding.</li>
+    </ul>
     <p>
-      We bewaren uw aanvraag zolang nodig is om ze te behandelen en op te volgen. Leidt de aanvraag niet tot een
-      opdracht, dan verwijderen we ze uiterlijk [termijn, bv. 12 maanden] na ons laatste contact. Gegevens die nodig zijn
-      voor de uitvoering van een opdracht of voor onze boekhouding bewaren we volgens de wettelijke termijnen.
+      De rechtsgrond is uw toestemming en de stappen die u vraagt vóór het sluiten van een overeenkomst. We gebruiken uw
+      gegevens niet voor reclame en verkopen ze nooit door.
+    </p>
+
+    <h2>4. Hoe lang bewaren we ze?</h2>
+    <p>
+      Aanvragen die niet tot een opdracht leiden, bewaren we maximaal 2 jaar. Gegevens over uitgevoerde opdrachten bewaren we
+      zolang de wet dat vereist, bijvoorbeeld 7 jaar voor de boekhouding.
+    </p>
+
+    <h2>5. Wie ontvangt uw gegevens?</h2>
+    <ul>
+      <li>Vercel Inc. (hosting van de website en verwerking van het formulier);</li>
+      <li>Resend (verzending van het formulier per e-mail naar Derycke);</li>
+      <li>onze e-mailprovider, waar uw aanvraag in onze mailbox terechtkomt;</li>
+      <li>Viewlaya, de webbouwer, enkel voor technisch onderhoud van de website.</li>
+    </ul>
+    <p>
+      Sommige van deze dienstverleners zijn gevestigd buiten de Europese Economische Ruimte. Doorgifte gebeurt dan op basis
+      van de waarborgen van de AVG, zoals de standaardcontractbepalingen van de Europese Commissie.
     </p>
 
     <h2>6. Cookies</h2>
     <p>
-      Deze website gebruikt geen cookies voor statistieken of reclame en laadt geen externe lettertypes of
-      trackingdiensten. Er is daarom geen cookiebanner nodig. Voegt Derycke later zulke diensten toe, dan wordt deze
-      verklaring aangepast en vragen we vooraf uw toestemming.
+      De website gebruikt geen cookies voor statistieken of advertenties. Enkel strikt noodzakelijke technische opslag kan
+      worden gebruikt om de website correct te laten werken. Komen er later statistieken of advertentiemetingen bij, dan
+      vragen we eerst uw toestemming.
     </p>
 
     <h2>7. Uw rechten</h2>
     <p>
-      U heeft het recht om uw gegevens in te zien, te laten verbeteren of verwijderen, de verwerking te laten beperken,
-      bezwaar te maken en uw gegevens over te dragen. Stuur daarvoor een bericht naar
-      {contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : ` [${ontbreekt}]`}. We antwoorden binnen de
-      wettelijke termijn van één maand.
+      U heeft het recht om uw gegevens in te kijken, te verbeteren, te laten wissen, de verwerking te beperken, bezwaar te
+      maken en uw gegevens over te dragen. U kunt uw toestemming ook altijd intrekken. Stuur uw vraag naar
+      <a href={`mailto:${contact.email}`}>{contact.email}</a>. We antwoorden binnen de wettelijke termijn van één maand.
     </p>
     <p>
       Bent u niet tevreden over hoe we met uw gegevens omgaan, dan kunt u een klacht indienen bij de
@@ -107,8 +94,8 @@ const leeg = (v: string | null) => v ?? `[${ontbreekt}]`;
 
     <h2>8. Beveiliging</h2>
     <p>
-      De website werkt uitsluitend via een beveiligde verbinding (https). Formuliergegevens worden niet in een databank
-      op de website bewaard, maar rechtstreeks per e-mail naar ons doorgestuurd.
+      De website werkt uitsluitend via een beveiligde verbinding (https). Formuliergegevens en foto's worden niet in een
+      databank op de website bewaard, maar rechtstreeks per e-mail naar ons doorgestuurd.
     </p>
 
     <h2>9. Wijzigingen</h2>
@@ -117,9 +104,6 @@ const leeg = (v: string | null) => v ?? `[${ontbreekt}]`;
 </Basis>
 
 <style>
-  .concept {
-    margin-top: 1.75rem;
-  }
   .tekst {
     padding-bottom: var(--sectie);
   }

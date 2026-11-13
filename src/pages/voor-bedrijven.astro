@@ -31,6 +31,8 @@ const aanpak = [
   { titel: 'Vast aanspreekpunt', tekst: 'Eén contactpersoon die uw project en uw verwachtingen kent.' },
   { titel: 'Heldere offerte per project of fase', tekst: 'Zodat u kosten kunt plannen en goedkeuren binnen uw organisatie.' },
   { titel: 'Planning in overleg', tekst: 'Afgestemd op opleverdata, huurwissels of de openingsuren van uw zaak.' },
+  { titel: 'Snel klaar tussen twee huurders', tekst: 'Opfris- en herstelwerken worden zo gepland dat het pand vlot opnieuw verhuurd kan worden.' },
+  { titel: 'Duidelijke facturatie', tekst: 'Facturen per pand, project of fase, met een heldere omschrijving van de uitgevoerde werken.' },
   { titel: 'Verzorgde werf', tekst: 'Een opgeruimde werkplek en een pand dat na de werken meteen bruikbaar is.' },
 ];
 ---
@@ -46,7 +48,7 @@ const aanpak = [
     kruimels={[{ naam: 'Voor bedrijven' }]}
   >
     <div class="acties">
-      <a href="/contact/?klant=professioneel#offerte" class="knop">Bespreek uw project <Pijl /></a>
+      <a href="/contact/?klant=vastgoed#offerte" class="knop">Bespreek uw project <Pijl /></a>
     </div>
   </PaginaKop>
 
@@ -56,8 +58,8 @@ const aanpak = [
 
   <section class="sectie" aria-labelledby="voor-wie">
     <div class="wrap">
-      <h2 id="voor-wie" class="titel">Voor wie we werken</h2>
-      <div class="doelgroepen">
+      <h2 id="voor-wie" class="titel" data-reveal>Voor wie we werken</h2>
+      <div class="doelgroepen" data-reveal-groep>
         {
           doelgroepen.map((g) => (
             <article>
@@ -77,7 +79,7 @@ const aanpak = [
     <div class="wrap aanpak__grid">
       <div>
         <h2 id="aanpak-titel" class="titel">Wat u van ons mag verwachten</h2>
-        <dl class="aanpak__lijst">
+        <dl class="aanpak__lijst" data-reveal-groep>
           {
             aanpak.map((a) => (
               <div>
@@ -93,6 +95,7 @@ const aanpak = [
   </section>
 
   <OfferteSlot
+    klant="vastgoed"
     titel="Een project in voorbereiding?"
     tekst="Bezorg ons de plannen, het aantal eenheden of een beschrijving van de werken. We nemen contact met u op om de mogelijkheden en de planning te bespreken."
     beeld={{ src: inkomhal, alt: 'Gerenoveerde inkomhal met gelakte trap' }}

@@ -1,11 +1,12 @@
 ---
 import Logo from './Logo.astro';
-import { site, navigatie, ontbreekt } from '../config/site';
+import { site, navigatie, telLink, whatsappLink } from '../config/site';
 import { diensten } from '../data/diensten';
 
 const { contact, adres, onderneming } = site;
 const jaar = new Date().getFullYear();
 const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+const wa = whatsappLink();
 ---
 
 <footer class="voet donker">
@@ -35,25 +36,10 @@ const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolea
       <div class="voet__kol">
         <p class="voet__titel">Contact</p>
         <ul class="voet__contact">
-          <li>
-            {
-              contact.telefoon ? (
-                <a href={`tel:${contact.telefoon.replace(/\s/g, '')}`}>{contact.telefoonWeergave ?? contact.telefoon}</a>
-              ) : (
-                site.demo && <span class="voet__leeg">Telefoon: {ontbreekt}</span>
-              )
-            }
-          </li>
-          <li>
-            {
-              contact.email ? (
-                <a href={`mailto:${contact.email}`}>{contact.email}</a>
-              ) : (
-                site.demo && <span class="voet__leeg">E-mail: {ontbreekt}</span>
-              )
-            }
-          </li>
-          <li>{adresRegel || (site.demo && <span class="voet__leeg">Adres: {ontbreekt}</span>)}</li>
+          {telLink && <li><a href={telLink}>{contact.telefoonWeergave ?? contact.telefoon}</a></li>}
+          {contact.email && <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>}
+          {wa && <li><a href={wa} target="_blank" rel="noopener">WhatsApp</a></li>}
+          <li class="voet__regio">Actief in {site.regio}</li>
         </ul>
         <a href="/contact/#offerte" class="knop knop--licht voet__cta">Offerte aanvragen</a>
       </div>
@@ -62,29 +48,19 @@ const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolea
     <span class="lijn" aria-hidden="true"></span>
 
     <div class="voet__onder">
-      <p>
-        © {jaar} {site.naam}
-        {onderneming.rechtsvorm && <> {onderneming.rechtsvorm}</>}
-        {
-          onderneming.ondernemingsnummer ? (
-            <>, ondernemingsnummer {onderneming.ondernemingsnummer}</>
-          ) : (
-            site.demo && <span class="voet__leeg">, ondernemingsnummer: {ontbreekt}</span>
-          )
-        }
+      <p class="voet__wettelijk">
+        © {jaar} {site.naam}{onderneming.rechtsvorm && ` ${onderneming.rechtsvorm}`}
+        {onderneming.ondernemingsnummer && <><span aria-hidden="true"> · </span>btw {onderneming.ondernemingsnummer}</>}
+        {adresRegel && <><span aria-hidden="true"> · </span>{adresRegel}</>}
+        {contact.telefoonWeergave && <><span aria-hidden="true"> · </span>{contact.telefoonWeergave}</>}
+        {contact.email && <><span aria-hidden="true"> · </span>{contact.email}</>}
       </p>
       <ul>
         <li><a href="/privacyverklaring/">Privacyverklaring</a></li>
         <li><a href="/sitemap-index.xml">Sitemap</a></li>
+        <li><a href="https://viewlayaweb.com" rel="noopener">Website door Viewlaya</a></li>
       </ul>
     </div>
-    {
-      site.demo && (
-        <p class="voet__demo">
-          Demoversie. De identiteit is een voorstel en de beelden zijn inspiratiebeelden, geen realisaties van Derycke.
-        </p>
-      )
-    }
   </div>
 </footer>
 
@@ -131,9 +107,11 @@ const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolea
   .voet__contact {
     margin-bottom: 1.5rem !important;
   }
-  .voet__leeg {
+  .voet__regio {
     color: var(--op-donker);
-    font-style: italic;
+  }
+  .voet__wettelijk {
+    max-width: 52rem;
   }
   .voet__cta {
     min-height: 2.9rem;
@@ -157,12 +135,6 @@ const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolea
   .voet__onder li + li {
     margin-top: 0;
   }
-  .voet__demo {
-    margin: 1.5rem 0 0;
-    color: var(--op-donker);
-    font-size: var(--fs-0);
-  }
-
   @media (max-width: 960px) {
     .voet__top {
       grid-template-columns: 1fr 1fr;

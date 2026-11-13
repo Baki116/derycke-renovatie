@@ -1,0 +1,31 @@
+---
+/**
+ * Plaats voor Google-reviews. Blijft verborgen tot er echte reviews zijn
+ * (src/config/site.ts → reviews.tonen en reviews.googleLink). Nooit verzonnen reviews.
+ */
+import { site } from '../config/site';
+const { tonen, googleLink } = site.reviews;
+---
+
+{
+  tonen && googleLink && (
+    <section class="sectie reviews" aria-labelledby="reviews-titel">
+      <div class="wrap reviews__in" data-reveal>
+        <p class="nr">Ervaringen</p>
+        <h2 id="reviews-titel">Wat klanten over Derycke zeggen</h2>
+        <p class="zacht maat">Lees de beoordelingen van onze klanten op Google.</p>
+        <a class="knop knop--lijn" href={googleLink} target="_blank" rel="noopener">
+          Bekijk de reviews op Google
+        </a>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .reviews__in {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+</style>

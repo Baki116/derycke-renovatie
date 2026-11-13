@@ -3,7 +3,8 @@ import '../styles/global.css';
 import { getImage } from 'astro:assets';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { site } from '../config/site';
+import ContactKnoppen from '../components/ContactKnoppen.astro';
+import { site, isProductie } from '../config/site';
 import { diensten } from '../data/diensten';
 import ogBron from '../assets/beelden/hero-woonkamer.jpg';
 
@@ -13,40 +14,52 @@ interface Props {
   /** Extra JSON-LD voor deze pagina (bv. BreadcrumbList of FAQPage). */
   schema?: Record<string, unknown>[];
   noindex?: boolean;
+  /** Onderwerp voor het vooraf ingevulde WhatsApp-bericht, bv. "badkamerrenovatie". */
+  onderwerp?: string;
+  /** Dienst die het offerteformulier en de assistent vooraf selecteren. */
+  dienst?: string;
 }
 
-const { titel, omschrijving, schema = [], noindex = false } = Astro.props;
+const { titel, omschrijving, schema = [], noindex = false, onderwerp, dienst } = Astro.props;
 
 const volledigeTitel = titel.includes('Derycke') ? titel : `${titel} | Derycke Renovatie & Schilderwerken`;
-const canoniek = new URL(Astro.url.pathname, Astro.site);
-const robots = !site.indexeerbaar || noindex ? 'noindex, nofollow' : 'index, follow';
+const canoniek = new URL(Astro.url.pathname, site.domein).href;
+const robots = !isProductie || noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large';
 
 const og = await getImage({ src: ogBron, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 78 });
-const ogUrl = new URL(og.src, Astro.site).href;
+const ogUrl = new URL(og.src, site.domein).href;
+const logoUrl = new URL('/logo/derycke-logo-donker.svg', site.domein).href;
 
 // Gestructureerde data: enkel bevestigde gegevens.
 const bedrijf: Record<string, unknown> = {
   '@context': 'https://schema.org',
-  '@type': 'HomeAndConstructionBusiness',
-  '@id': new URL('/#bedrijf', Astro.site).href,
+  '@type': ['HomeAndConstructionBusiness', 'HousePainter', 'GeneralContractor'],
+  '@id': `${site.domein}/#bedrijf`,
   name: site.naam,
   slogan: site.slogan,
-  url: new URL('/', Astro.site).href,
-  areaServed: { '@type': 'AdministrativeArea', name: 'Vlaanderen' },
-  knowsAbout: diensten.map((d) => d.titel),
-};
-if (site.contact.telefoon) bedrijf.telephone = site.contact.telefoon;
-if (site.contact.email) bedrijf.email = site.contact.email;
-if (site.adres.straat && site.adres.postcode && site.adres.gemeente) {
-  bedrijf.address = {
+  url: `${site.domein}/`,
+  logo: logoUrl,
+  image: ogUrl,
+  telephone: site.contact.telefoon,
+  email: site.contact.email,
+  vatID: site.onderneming.ondernemingsnummer,
+  address: {
     '@type': 'PostalAddress',
     streetAddress: site.adres.straat,
     postalCode: site.adres.postcode,
     addressLocality: site.adres.gemeente,
     addressCountry: 'BE',
-  };
-}
-if (site.onderneming.ondernemingsnummer) bedrijf.vatID = site.onderneming.ondernemingsnummer;
+  },
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Vlaanderen' },
+    ...['West-Vlaanderen', 'Oost-Vlaanderen', 'Antwerpen', 'Vlaams-Brabant', 'Limburg'].map((p) => ({
+      '@type': 'AdministrativeArea',
+      name: p,
+    })),
+  ],
+  knowsAbout: diensten.map((d) => d.titel),
+  sameAs: [],
+};
 
 const alleSchema = [bedrijf, ...schema];
 ---
@@ -55,17 +68,18 @@ const alleSchema = [bedrijf, ...schema];
 <html lang="nl-BE">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
     <title>{volledigeTitel}</title>
     <meta name="description" content={omschrijving} />
     <link rel="canonical" href={canoniek} />
     <meta name="robots" content={robots} />
     <meta name="theme-color" content="#24272b" />
+    <meta name="format-detection" content="telephone=no" />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="sitemap" href="/sitemap-index.xml" />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="nl_BE" />
@@ -76,24 +90,24 @@ const alleSchema = [bedrijf, ...schema];
     <meta property="og:image" content={ogUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Derycke Renovatie & Schilderwerken, vakmanschap in elke afwerking" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={volledigeTitel} />
+    <meta name="twitter:description" content={omschrijving} />
+    <meta name="twitter:image" content={ogUrl} />
 
     <script type="application/ld+json" set:html={JSON.stringify(alleSchema.length === 1 ? alleSchema[0] : alleSchema)} />
   </head>
-  <body>
+  <body data-dienst={dienst}>
     <a class="skiplink" href="#inhoud">Naar de inhoud</a>
-    {
-      site.demo && (
-        <p class="voorbeeldband">
-          Voorbeeldversie: een eerste ontwerp om de richting te tonen. De definitieve website wordt afgewerkt met uw eigen
-          foto's, logo en gegevens.
-        </p>
-      )
-    }
     <Header />
     <main id="inhoud" tabindex="-1">
       <slot />
     </main>
     <Footer />
+    <ContactKnoppen onderwerp={onderwerp} dienst={dienst} />
+    <script>
+      import '../scripts/beweging';
+    </script>
   </body>
 </html>

@@ -1,17 +1,35 @@
 ---
 import Basis from '../../layouts/Basis.astro';
+import { site, telLink } from '../../config/site';
 ---
 
 <Basis titel="Aanvraag verzonden" omschrijving="Uw offerteaanvraag werd verzonden." noindex>
   <section class="sectie">
     <div class="wrap bedankt">
       <span class="lijn" aria-hidden="true"></span>
-      <h1>Bedankt, uw aanvraag is verzonden.</h1>
-      <p class="lead">We hebben uw offerteaanvraag goed ontvangen en nemen contact met u op om uw project te bespreken.</p>
+      <h1>Bedankt, we nemen {site.antwoordtermijn} contact met u op.</h1>
+      <p class="lead">
+        Uw offerteaanvraag is goed ontvangen<span data-fototekst></span>. We bekijken uw project en bellen of mailen u om
+        de volgende stap af te spreken.
+      </p>
+      <p class="zacht">
+        Iets vergeten of dringend? Bel ons op <a href={telLink}>{site.contact.telefoonWeergave}</a>.
+      </p>
       <a href="/" class="tekstlink">Terug naar de startpagina</a>
     </div>
   </section>
 </Basis>
+
+<script>
+  import { meldConversie } from '../../scripts/conversie';
+  // Aantal foto's tonen (uit ?fotos=)
+  const n = Number(new URLSearchParams(location.search).get('fotos') || 0);
+  const el = document.querySelector('[data-fototekst]');
+  if (el && n > 0) el.textContent = `, met ${n} foto${n > 1 ? "'s" : ''}`;
+
+  // Conversie voor Google Ads en GA4: enkel met toestemming en geïnstalleerde Google tag (nu: niets).
+  meldConversie({ bron: 'formulier', fotos: n });
+</script>
 
 <style>
   .bedankt .lijn {
@@ -20,10 +38,13 @@ import Basis from '../../layouts/Basis.astro';
   }
   h1 {
     font-size: var(--fs-5);
-    max-width: 16ch;
+    max-width: 18ch;
     margin-bottom: 1.5rem;
   }
   .lead {
+    margin-bottom: 1rem;
+  }
+  .bedankt .zacht {
     margin-bottom: 2rem;
   }
 </style>

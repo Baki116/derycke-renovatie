@@ -1,0 +1,188 @@
+---
+/**
+ * Gestileerde kaart van Vlaanderen (puntenraster), berekend bij het bouwen.
+ * De omtrek is vereenvoudigd: het is een illustratie, geen exacte kaart.
+ */
+const omtrek: [number, number][] = [
+  [2.54, 51.09], [2.9, 51.23], [3.37, 51.37], [3.5, 51.27], [3.9, 51.21], [4.0, 51.25], [4.24, 51.36], [4.42, 51.47],
+  [4.55, 51.43], [4.77, 51.5], [5.04, 51.48], [5.24, 51.31], [5.5, 51.29], [5.85, 51.15], [5.8, 51.0], [5.75, 50.82],
+  [5.68, 50.76], [5.45, 50.73], [5.2, 50.73], [4.95, 50.77], [4.75, 50.74], [4.6, 50.77], [4.45, 50.7], [4.25, 50.71],
+  [4.0, 50.72], [3.87, 50.75], [3.6, 50.73], [3.35, 50.72], [3.2, 50.75], [3.0, 50.78], [2.9, 50.7], [2.65, 50.82],
+  [2.54, 50.88],
+];
+const steden = [
+  { naam: 'Brugge', lon: 3.22, lat: 51.21 },
+  { naam: 'Oostende', lon: 2.92, lat: 51.22, links: true },
+  { naam: 'Gent', lon: 3.72, lat: 51.05 },
+  { naam: 'Kortrijk', lon: 3.26, lat: 50.83 },
+  { naam: 'Aalst', lon: 4.04, lat: 50.94 },
+  { naam: 'Antwerpen', lon: 4.4, lat: 51.22 },
+  { naam: 'Mechelen', lon: 4.48, lat: 51.03 },
+  { naam: 'Leuven', lon: 4.7, lat: 50.88 },
+  { naam: 'Hasselt', lon: 5.34, lat: 50.93 },
+];
+
+const K = Math.cos((51 * Math.PI) / 180);
+const S = 300; // pixels per breedtegraad
+const minLon = 2.5;
+const maxLat = 51.52;
+const px = (lon: number) => (lon - minLon) * K * S;
+const py = (lat: number) => (maxLat - lat) * S;
+const B = Math.ceil(px(5.9));
+const H = Math.ceil(py(50.66));
+
+const pad = 'M' + omtrek.map(([lo, la]) => `${px(lo).toFixed(1)} ${py(la).toFixed(1)}`).join(' L') + ' Z';
+const provincies = ['West-Vlaanderen', 'Oost-Vlaanderen', 'Antwerpen', 'Vlaams-Brabant', 'Limburg'];
+---
+
+<section class="sectie zone" aria-labelledby="zone-titel">
+  <div class="wrap zone__grid">
+    <div class="zone__tekst" data-reveal>
+      <p class="nr">Werkgebied</p>
+      <h2 id="zone-titel">Actief in heel Vlaanderen.</h2>
+      <p class="zacht maat">
+        Van de kust tot Limburg: Derycke werkt voor particulieren, bedrijven en vastgoedprofessionals in alle Vlaamse
+        provincies.
+      </p>
+      <ul class="zone__prov">
+        {provincies.map((p) => <li>{p}</li>)}
+      </ul>
+    </div>
+    <figure class="zone__kaart" data-reveal>
+      <svg viewBox={`0 0 ${B} ${H}`} role="img" aria-labelledby="zone-kaart-titel">
+        <title id="zone-kaart-titel">Gestileerde kaart van Vlaanderen met onder meer Brugge, Gent, Kortrijk, Antwerpen, Mechelen, Leuven en Hasselt</title>
+        <defs>
+          <pattern id="zone-raster" width="9" height="9" patternUnits="userSpaceOnUse">
+            <circle cx="4.5" cy="4.5" r="1.7" />
+          </pattern>
+          <clipPath id="zone-vorm"><path d={pad} /></clipPath>
+        </defs>
+        <g class="zone__vlak">
+          <rect width={B} height={H} fill="url(#zone-raster)" clip-path="url(#zone-vorm)" class="zone__punten" />
+        </g>
+        <path class="zone__omtrek" d={pad} />
+        <g class="zone__steden">
+          {
+            steden.map((s, i) => (
+              <g transform={`translate(${px(s.lon).toFixed(1)} ${py(s.lat).toFixed(1)})`} style={`--s:${i}`}>
+                <circle r="11" class="zone__puls" />
+                <circle r="4.2" class="zone__stip" />
+                <text x={s.links ? -9 : 9} y="-9" text-anchor={s.links ? 'end' : 'start'}>
+                  {s.naam}
+                </text>
+              </g>
+            ))
+          }
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .zone {
+    background: var(--wit);
+    border-block: 1px solid var(--steen-licht);
+  }
+  .zone__grid {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 3rem clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+  .zone h2 {
+    margin-bottom: 1.25rem;
+    max-width: 12ch;
+  }
+  .zone__prov {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .zone__prov li {
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--steen);
+    border-radius: 999px;
+    font-size: var(--fs-1);
+  }
+  .zone__kaart {
+    margin: 0;
+  }
+  .zone__kaart svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .zone__omtrek {
+    fill: none;
+    stroke: var(--steen);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    opacity: 0.6;
+  }
+  .zone__kaart :global(pattern circle) {
+    fill: var(--steen);
+  }
+  .zone__punten {
+    opacity: 0.75;
+  }
+  .js .zone__kaart .zone__vlak {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 1.6s var(--ease) 0.2s;
+  }
+  .js .zone__kaart.is-zichtbaar .zone__vlak {
+    clip-path: inset(0 0 0 0);
+  }
+  .zone__stip {
+    fill: var(--brons);
+  }
+  .zone__puls {
+    fill: none;
+    stroke: var(--brons);
+    stroke-width: 1;
+    opacity: 0;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  .zone__kaart.is-zichtbaar .zone__puls {
+    animation: puls 3.2s ease-out infinite;
+    animation-delay: calc(1s + var(--s) * 0.35s);
+  }
+  @keyframes puls {
+    0% {
+      opacity: 0.8;
+      transform: scale(0.3);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+  }
+  .zone__steden text {
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 560;
+    fill: var(--antraciet);
+    paint-order: stroke;
+    stroke: var(--wit);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+  }
+  @media (max-width: 960px) {
+    .zone__grid {
+      grid-template-columns: 1fr;
+    }
+    .zone__steden text {
+      font-size: 24px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .zone__kaart.is-zichtbaar .zone__puls {
+      animation: none;
+    }
+  }
+</style>

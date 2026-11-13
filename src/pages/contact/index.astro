@@ -2,11 +2,11 @@
 import Basis from '../../layouts/Basis.astro';
 import PaginaKop from '../../components/PaginaKop.astro';
 import OfferteFormulier from '../../components/OfferteFormulier.astro';
-import { site, ontbreekt } from '../../config/site';
+import { site, telLink, whatsappLink } from '../../config/site';
 import { kruimelSchema } from '../../lib/schema';
 
-const { contact, adres } = site;
-const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+const { contact } = site;
+const wa = whatsappLink();
 ---
 
 <Basis
@@ -23,14 +23,6 @@ const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolea
   <div class="wrap contact">
     <section class="contact__form" id="offerte" aria-labelledby="form-titel">
       <h2 id="form-titel" class="sr-only">Offerteformulier</h2>
-      {
-        site.demo && (
-          <p class="demo-melding contact__demo">
-            Voorbeeldversie: u kunt het formulier invullen en uitproberen, maar het verstuurt nog geen berichten. De
-            koppeling met uw e-mailadres gebeurt bij de oplevering van de definitieve website.
-          </p>
-        )
-      }
       <OfferteFormulier />
     </section>
 
@@ -39,31 +31,24 @@ const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolea
       <dl>
         <div>
           <dt>Telefoon</dt>
-          <dd>
-            {
-              contact.telefoon ? (
-                <a href={`tel:${contact.telefoon.replace(/\s/g, '')}`}>{contact.telefoonWeergave ?? contact.telefoon}</a>
-              ) : (
-                <span class="leeg">{ontbreekt}</span>
-              )
-            }
-          </dd>
+          <dd><a href={telLink}>{contact.telefoonWeergave}</a></dd>
+        </div>
+        <div>
+          <dt>WhatsApp</dt>
+          <dd><a href={wa} target="_blank" rel="noopener">Stuur ons een bericht</a></dd>
         </div>
         <div>
           <dt>E-mail</dt>
-          <dd>
-            {contact.email ? <a href={`mailto:${contact.email}`}>{contact.email}</a> : <span class="leeg">{ontbreekt}</span>}
-          </dd>
-        </div>
-        <div>
-          <dt>Adres</dt>
-          <dd>{adresRegel || <span class="leeg">{ontbreekt}</span>}</dd>
+          <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
         </div>
         <div>
           <dt>Werkgebied</dt>
           <dd>Heel Vlaanderen</dd>
         </div>
       </dl>
+      <button type="button" class="knop knop--lijn contact__assistent" data-assistent-open aria-controls="assistent" aria-haspopup="dialog">
+        Liever stap voor stap? Vraag het de assistent
+      </button>
 
       <div class="contact__tips">
         <h3>Tips voor uw aanvraag</h3>
@@ -85,8 +70,9 @@ const adresRegel = [adres.straat, [adres.postcode, adres.gemeente].filter(Boolea
     padding-bottom: var(--sectie);
     align-items: start;
   }
-  .contact__demo {
-    margin-bottom: 2rem;
+  .contact__assistent {
+    width: 100%;
+    margin-top: 1.5rem;
   }
   .contact__info {
     position: sticky;

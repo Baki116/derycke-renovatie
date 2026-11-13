@@ -1,6 +1,8 @@
 ---
 import Basis from '../../layouts/Basis.astro';
 import PaginaKop from '../../components/PaginaKop.astro';
+import VoorNa from '../../components/VoorNa.astro';
+import { voorNa } from '../../data/beelden';
 import RealisatieKaart from '../../components/RealisatieKaart.astro';
 import OfferteSlot from '../../components/OfferteSlot.astro';
 import { gepubliceerdeRealisaties } from '../../lib/realisaties';
@@ -44,7 +46,7 @@ const types = [...new Set(items.map((r) => r.data.typeWerken))];
       echte.length > 0 && (
         <section aria-labelledby="echte" class="blok">
           <h2 id="echte" class="sr-only">Uitgevoerde projecten</h2>
-          <div class="raster">
+          <div class="raster" data-reveal-groep>
             {echte.map((r) => (
               <div data-item={r.data.typeWerken}>
                 <RealisatieKaart item={r} koptag="h3" sizes="(min-width: 900px) 45vw, 100vw" />
@@ -55,17 +57,29 @@ const types = [...new Set(items.map((r) => r.data.typeWerken))];
       )
     }
 
+    <section aria-labelledby="voorna" class="blok">
+      <div class="blok__kop">
+        <h2 id="voorna">Voor en na</h2>
+        <p class="zacht">Schuif over het beeld om te vergelijken. Inspiratiebeelden, tot onze eigen werven gefotografeerd zijn.</p>
+      </div>
+      <div class="voorna__raster" data-reveal-groep>
+        {voorNa.map((p, i) => (
+          <VoorNa voor={p.voor} na={p.na} titel={p.titel} ratio={i === 0 ? '3 / 2' : '4 / 5'} sizes="(min-width: 900px) 50vw, 100vw" />
+        ))}
+      </div>
+    </section>
+
     {
       inspiratie.length > 0 && (
         <section aria-labelledby="insp" class="blok">
           <div class="blok__kop">
             <h2 id="insp">Inspiratiebeelden</h2>
-            <p class="demo-melding">
+            <p class="notitie">
               Deze beelden zijn inspiratiebeelden en tonen geen projecten die door Derycke uitgevoerd zijn. Ze worden
               vervangen door echte realisaties.
             </p>
           </div>
-          <div class="raster">
+          <div class="raster" data-reveal-groep>
             {inspiratie.map((r) => (
               <div data-item={r.data.typeWerken}>
                 <RealisatieKaart item={r} koptag="h3" sizes="(min-width: 900px) 45vw, 100vw" />
@@ -83,6 +97,17 @@ const types = [...new Set(items.map((r) => r.data.typeWerken))];
 </Basis>
 
 <style>
+  .voorna__raster {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .voorna__raster {
+      grid-template-columns: 1fr;
+    }
+  }
   .filter {
     display: flex;
     flex-wrap: wrap;

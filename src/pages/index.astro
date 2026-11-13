@@ -5,7 +5,12 @@ import Pijl from '../components/Pijl.astro';
 import Werkwijze from '../components/Werkwijze.astro';
 import OfferteSlot from '../components/OfferteSlot.astro';
 import RealisatieKaart from '../components/RealisatieKaart.astro';
+import VoorNa from '../components/VoorNa.astro';
+import MerkenBand from '../components/MerkenBand.astro';
+import Werkgebied from '../components/Werkgebied.astro';
+import Reviews from '../components/Reviews.astro';
 import { site } from '../config/site';
+import { voorNa } from '../data/beelden';
 import { diensten } from '../data/diensten';
 import { gepubliceerdeRealisaties } from '../lib/realisaties';
 import hero from '../assets/beelden/hero-woonkamer.jpg';
@@ -31,8 +36,12 @@ const redenen = [
   <!-- ── Hero ─────────────────────────────────────────────── -->
   <section class="hero" aria-labelledby="hero-titel">
     <div class="hero__tekst">
-      <p class="kicker">Renovatie- en schilderwerken in {site.regio}</p>
-      <h1 id="hero-titel">Vakmanschap in elke afwerking.</h1>
+      <p class="kicker hero__kicker">Renovatie- en schilderwerken in {site.regio}</p>
+      <h1 id="hero-titel" class="regels">
+        <span class="regel"><span style="--r:0">Vakmanschap</span></span>
+        <span class="regel"><span style="--r:1">in elke</span></span>
+        <span class="regel"><span style="--r:2">afwerking.</span></span>
+      </h1>
       <span class="lijn hero__lijn" aria-hidden="true"></span>
       <p class="hero__lead">
         Van schilderwerken en vloeren tot een nieuwe badkamer of keuken: Derycke renoveert woningen en panden
@@ -51,17 +60,18 @@ const redenen = [
       eager
       class="hero__beeld"
       focus="62% 50%"
+      zoom
     />
   </section>
 
   <!-- ── Presentatie ───────────────────────────────────────── -->
   <section class="sectie intro" aria-label="Over Derycke">
     <div class="wrap intro__grid">
-      <p class="intro__groot">
+      <p class="intro__groot" data-reveal>
         Derycke Renovatie &amp; Schilderwerken is uw partner voor professionele renovatie- en schilderwerken in heel
         Vlaanderen.
       </p>
-      <div class="intro__klein">
+      <div class="intro__klein" data-reveal style="--i:1">
         <p>
           Van een stijlvolle badkamer of een moderne keuken tot nieuwe vloeren en strak schilderwerk: we werken naar een
           kwalitatief eindresultaat, met aandacht voor elk detail.
@@ -75,18 +85,22 @@ const redenen = [
   <!-- ── Diensten ──────────────────────────────────────────── -->
   <section class="sectie diensten" aria-labelledby="diensten-titel" data-diensten>
     <div class="wrap">
-      <div class="diensten__kop">
-        <h2 id="diensten-titel">Onze diensten</h2>
+      <div class="diensten__kop" data-reveal>
+        <div>
+          <p class="nr">Diensten</p>
+          <h2 id="diensten-titel">Onze diensten</h2>
+        </div>
         <p class="zacht maat">Vijf vakgebieden die in een renovatie vaak samenkomen. Wij stemmen ze op elkaar af.</p>
       </div>
       <div class="diensten__grid">
-        <ul class="diensten__lijst">
+        <ul class="diensten__lijst" data-reveal-groep>
           {
             diensten.map((d, i) => (
               <li>
                 <a href={`/diensten/${d.slug}/`} class="dienst" data-index={i}>
                   <Foto src={d.beeld.src} alt="" sizes="96px" widths={[192]} ratio="1" class="dienst__mini" inspiratie={false} />
                   <span class="dienst__tekst">
+                    <span class="dienst__nr" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                     <span class="dienst__titel">{d.titel}</span>
                     <span class="dienst__kort">{d.kort}</span>
                   </span>
@@ -112,19 +126,19 @@ const redenen = [
   <!-- ── Realisaties ───────────────────────────────────────── -->
   <section class="sectie realisaties" aria-labelledby="real-titel">
     <div class="wrap">
-      <div class="realisaties__kop">
+      <div class="realisaties__kop" data-reveal>
         <h2 id="real-titel">{alleenInspiratie ? 'Inspiratie voor uw project' : 'Recente realisaties'}</h2>
         <a href="/realisaties/" class="tekstlink">{alleenInspiratie ? 'Bekijk alle inspiratiebeelden' : 'Bekijk alle realisaties'}</a>
       </div>
       {
         alleenInspiratie && (
-          <p class="demo-melding realisaties__melding">
-            Deze selectie bestaat uit inspiratiebeelden. Het zijn geen realisaties van Derycke. De eerste werven
-            verschijnen hier zodra ze gefotografeerd zijn.
+          <p class="notitie realisaties__melding">
+            Deze selectie bestaat uit inspiratiebeelden, geen realisaties van Derycke. Onze eigen werven verschijnen hier
+            zodra ze gefotografeerd zijn.
           </p>
         )
       }
-      <div class="realisaties__grid">
+      <div class="realisaties__grid" data-reveal-groep>
         {
           realisaties.map((r, i) => (
             <RealisatieKaart
@@ -138,10 +152,29 @@ const redenen = [
     </div>
   </section>
 
+  <!-- ── Voor en na ───────────────────────────────────────── -->
+  <section class="sectie voorna" aria-labelledby="voorna-titel">
+    <div class="wrap">
+      <div class="voorna__kop" data-reveal>
+        <div>
+          <p class="nr">Voor en na</p>
+          <h2 id="voorna-titel">Het verschil zit in de afwerking.</h2>
+        </div>
+        <p class="zacht maat">Schuif over het beeld om de situatie voor en na een renovatie te vergelijken.</p>
+      </div>
+      <div data-reveal>
+        <VoorNa voor={voorNa[0].voor} na={voorNa[0].na} titel={voorNa[0].titel} />
+      </div>
+    </div>
+  </section>
+
+  <MerkenBand />
+
   <!-- ── Waarom Derycke ────────────────────────────────────── -->
   <section class="sectie waarom" aria-labelledby="waarom-titel">
     <div class="wrap waarom__grid">
-      <div class="waarom__links">
+      <div class="waarom__links" data-reveal>
+        <p class="nr">Waarom Derycke</p>
         <h2 id="waarom-titel">Waarom kiezen voor Derycke?</h2>
         <Foto
           src={parket}
@@ -152,11 +185,11 @@ const redenen = [
           class="waarom__beeld"
         />
       </div>
-      <ul class="waarom__lijst">
+      <ul class="waarom__lijst" data-reveal-groep>
         {
-          redenen.map((r) => (
+          redenen.map((r, i) => (
             <li>
-              <h3>{r.titel}</h3>
+              <h3><span class="waarom__nr" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>{r.titel}</h3>
               <p class="zacht">{r.tekst}</p>
             </li>
           ))
@@ -167,10 +200,12 @@ const redenen = [
 
   <Werkwijze />
 
+  <Werkgebied />
+
   <!-- ── Voor bedrijven ────────────────────────────────────── -->
   <section class="b2b donker" aria-labelledby="b2b-titel">
     <div class="wrap b2b__grid">
-      <div class="b2b__tekst">
+      <div class="b2b__tekst" data-reveal>
         <p class="kicker">Voor bedrijven en vastgoed</p>
         <h2 id="b2b-titel">Eén partner voor uw renovatie- en afwerkingswerken.</h2>
         <p class="zacht maat">
@@ -195,6 +230,8 @@ const redenen = [
     </div>
   </section>
 
+  <Reviews />
+
   <OfferteSlot />
 </Basis>
 
@@ -216,8 +253,26 @@ const redenen = [
     z-index: 1;
   }
   .hero h1 {
-    max-width: 9.5ch;
-    font-stretch: 108%;
+    font-size: clamp(2.6rem, 1.3rem + 3.1vw, 4.6rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-stretch: 102%;
+  }
+  .hero__kicker {
+    animation: zacht-in 0.9s var(--ease) both;
+  }
+  .hero__lead,
+  .hero__acties {
+    animation: zacht-in 1s var(--ease) 0.55s both;
+  }
+  .hero__acties {
+    animation-delay: 0.7s;
+  }
+  @keyframes zacht-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
   }
   /* De afwerkingslijn loopt vanuit de tekst door tot in het beeld */
   .hero__lijn {
@@ -338,6 +393,24 @@ const redenen = [
   .dienst__tekst {
     display: grid;
     gap: 0.35rem;
+    grid-template-columns: auto 1fr;
+    column-gap: 1.25rem;
+  }
+  .dienst__nr {
+    grid-row: span 2;
+    padding-top: 0.55rem;
+    font-size: var(--fs-0);
+    font-weight: 560;
+    color: var(--brons);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+  }
+  .dienst__titel {
+    transition: transform 0.45s var(--ease);
+  }
+  .dienst:hover .dienst__titel,
+  .dienst:focus-visible .dienst__titel {
+    transform: translateX(0.4rem);
   }
   .dienst__titel {
     font-size: var(--fs-4);
@@ -366,7 +439,13 @@ const redenen = [
   .dienst:focus-visible .dienst__pijl {
     background: var(--antraciet);
     border-color: var(--antraciet);
-    color: var(--kalk);
+    color: var(--brons-licht);
+  }
+  .dienst__pijl :global(svg) {
+    transition: transform 0.35s var(--ease);
+  }
+  .dienst:hover .dienst__pijl :global(svg) {
+    transform: translateX(3px);
   }
   .diensten__voorbeeld {
     position: sticky;
@@ -376,10 +455,33 @@ const redenen = [
   .diensten__laag {
     grid-area: 1 / 1;
     opacity: 0;
-    transition: opacity 0.5s var(--ease);
+    transition: opacity 0.6s var(--ease);
+  }
+  .diensten__laag :global(img) {
+    transform: scale(1.06);
+    transition: transform 1.4s var(--ease);
   }
   .diensten__laag.is-actief {
     opacity: 1;
+  }
+  .diensten__laag.is-actief :global(img) {
+    transform: scale(1);
+  }
+
+  /* Voor en na */
+  .voorna__kop {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem 3rem;
+    margin-bottom: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+  .voorna__kop h2 {
+    max-width: 14ch;
+  }
+  .voorna__kop p {
+    max-width: 24rem;
   }
 
   /* Realisaties */
@@ -432,6 +534,16 @@ const redenen = [
   }
   .waarom__lijst h3 {
     font-size: 1.2rem;
+    display: flex;
+    gap: 1rem;
+  }
+  .waarom__nr {
+    flex: none;
+    padding-top: 0.2rem;
+    font-size: var(--fs-0);
+    font-weight: 560;
+    color: var(--brons);
+    font-variant-numeric: tabular-nums;
   }
   .waarom__lijst p {
     font-size: var(--fs-1);

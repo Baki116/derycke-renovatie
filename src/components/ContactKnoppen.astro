@@ -1,0 +1,177 @@
+---
+/**
+ * Altijd bereikbaar: zwevende knoppen (assistent + WhatsApp) en, op mobiel,
+ * een vaste balk onderaan met Offerte · Bellen · WhatsApp.
+ */
+import Assistent from './Assistent.astro';
+import { site, telLink, whatsappLink } from '../config/site';
+
+interface Props {
+  onderwerp?: string;
+  dienst?: string;
+}
+const { onderwerp, dienst } = Astro.props;
+const wa = whatsappLink(onderwerp);
+const offerte = dienst ? `/contact/?dienst=${encodeURIComponent(dienst)}#offerte` : '/contact/#offerte';
+---
+
+<div class="zweef" data-zweef>
+  <button type="button" class="zweef__knop zweef__chat" aria-haspopup="dialog" aria-controls="assistent" data-assistent-open>
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 5h16v11H9l-5 4z" stroke-linejoin="round" /><path d="M8 9.5h8M8 12.5h5" /></svg>
+    <span class="zweef__label">Vraag het de assistent</span>
+  </button>
+  {
+    wa && (
+      <a class="zweef__knop zweef__wa" href={wa} target="_blank" rel="noopener" aria-label="Stuur ons een WhatsApp-bericht (opent in een nieuw venster)">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12.04 2.5a9.43 9.43 0 0 0-8.1 14.27L2.5 21.5l4.86-1.4A9.43 9.43 0 1 0 12.04 2.5Zm0 17.2a7.77 7.77 0 0 1-3.96-1.08l-.28-.17-2.88.83.85-2.8-.19-.29a7.78 7.78 0 1 1 6.46 3.51Zm4.27-5.82c-.23-.12-1.38-.68-1.6-.76-.21-.08-.37-.12-.53.12-.15.23-.6.76-.74.92-.14.15-.27.17-.5.06-.24-.12-.99-.37-1.89-1.17a7.07 7.07 0 0 1-1.3-1.63c-.14-.24-.02-.36.1-.48.11-.1.24-.27.35-.41.12-.14.16-.24.24-.4.08-.15.04-.29-.02-.41-.06-.12-.53-1.28-.73-1.75-.19-.46-.39-.4-.53-.4h-.46a.88.88 0 0 0-.63.3 2.66 2.66 0 0 0-.83 1.97 4.6 4.6 0 0 0 .97 2.45 10.56 10.56 0 0 0 4.05 3.57c.56.24 1 .39 1.35.5.57.18 1.08.15 1.49.09.46-.07 1.38-.56 1.58-1.1.2-.55.2-1.01.13-1.11-.05-.1-.21-.16-.44-.28Z"/>
+        </svg>
+      </a>
+    )
+  }
+</div>
+
+<nav class="mbalk" aria-label="Snel contact">
+  <a href={offerte} class="mbalk__hoofd">Offerte aanvragen</a>
+  {
+    telLink && (
+      <a href={telLink} class="mbalk__item">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.5 3.5h3l1.5 4-2 1.5a11 11 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16.5 16.5 0 0 1 4.5 5.5a2 2 0 0 1 2-2Z" stroke-linejoin="round" /></svg>
+        <span>Bellen</span>
+      </a>
+    )
+  }
+  {
+    wa && (
+      <a href={wa} class="mbalk__item" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 19.5l1.2-3.6A7.8 7.8 0 1 1 8.6 18.6z" stroke-linejoin="round" /></svg>
+        <span>WhatsApp</span>
+      </a>
+    )
+  }
+</nav>
+
+<Assistent dienst={dienst} />
+
+<style>
+  .zweef {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.65rem;
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  :global(html[data-assistent-open]) .zweef {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+  }
+  .zweef__knop {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--antraciet);
+    color: var(--kalk);
+    box-shadow: 0 10px 30px -12px rgba(20, 22, 25, 0.55);
+    cursor: pointer;
+    font: inherit;
+    font-size: var(--fs-1);
+    font-weight: 540;
+    text-decoration: none;
+    transition: transform 0.25s var(--ease), background-color 0.2s var(--ease);
+  }
+  .zweef__knop:hover {
+    transform: translateY(-2px);
+    background: #33373c;
+  }
+  .zweef__knop svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex: none;
+  }
+  .zweef__chat {
+    padding: 0 1.2rem 0 1rem;
+  }
+  .zweef__wa svg {
+    color: #7fc8a0;
+  }
+
+  .mbalk {
+    display: none;
+  }
+
+  @media (max-width: 960px) {
+    .zweef {
+      bottom: calc(4.4rem + env(safe-area-inset-bottom));
+    }
+    .zweef__label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .zweef__chat {
+      padding: 0;
+    }
+    /* WhatsApp zit al in de balk onderaan */
+    .zweef__wa {
+      display: none;
+    }
+    .mbalk {
+      position: fixed;
+      inset: auto 0 0 0;
+      z-index: 55;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: stretch;
+      gap: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      padding-bottom: env(safe-area-inset-bottom);
+      box-shadow: 0 -10px 30px -18px rgba(20, 22, 25, 0.5);
+    }
+    .mbalk a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      min-height: 3.6rem;
+      background: var(--antraciet);
+      color: var(--kalk);
+      text-decoration: none;
+      font-size: var(--fs-1);
+      font-weight: 560;
+    }
+    .mbalk__hoofd {
+      background: var(--kalk) !important;
+      color: var(--antraciet) !important;
+      border-top: 1px solid var(--antraciet);
+    }
+    .mbalk__item {
+      flex-direction: column;
+      gap: 0.15rem !important;
+      padding-inline: 1.1rem;
+      font-size: 0.72rem !important;
+      font-weight: 500 !important;
+      min-width: 4.6rem;
+    }
+    .mbalk__item svg {
+      width: 1.3rem;
+      height: 1.3rem;
+      color: var(--brons-licht);
+    }
+    :global(body) {
+      padding-bottom: calc(3.6rem + env(safe-area-inset-bottom));
+    }
+  }
+</style>

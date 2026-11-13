@@ -3,15 +3,21 @@ import Foto from './Foto.astro';
 import Pijl from './Pijl.astro';
 import standaard from '../assets/beelden/schilderwerk-lijn.jpg';
 import type { ImageMetadata } from 'astro';
-import { site } from '../config/site';
+import { site, telLink } from '../config/site';
 
 interface Props {
   titel?: string;
   tekst?: string;
   beeld?: { src: ImageMetadata; alt: string; inspiratie?: boolean };
+  /** Vooraf geselecteerde dienst in het formulier */
+  dienst?: string;
+  /** Vooraf geselecteerd klanttype: 'bedrijf' of 'vastgoed' */
+  klant?: string;
 }
 const {
   beeld = { src: standaard, alt: 'Strakke verflijn tussen een warmgrijze muur en een witte plafondlijst' },
+  dienst,
+  klant,
   titel = 'Vertel ons over uw project.',
   tekst = 'Beschrijf kort wat u wilt laten uitvoeren en voeg gerust enkele foto’s toe. We nemen contact met u op om uw aanvraag te bespreken.',
 } = Astro.props;
@@ -19,18 +25,19 @@ const {
 
 <section class="slot" aria-labelledby="slot-titel">
   <div class="wrap slot__grid">
-    <div class="slot__tekst">
+    <div class="slot__tekst" data-reveal>
       <h2 id="slot-titel">{titel}</h2>
       <p class="lead zacht">{tekst}</p>
       <div class="slot__acties">
-        <a href="/contact/#offerte" class="knop">Vraag uw vrijblijvende offerte aan <Pijl /></a>
+        <a href={`/contact/${dienst ? `?dienst=${encodeURIComponent(dienst)}` : klant ? `?klant=${klant}` : ''}#offerte`} class="knop">Vraag uw vrijblijvende offerte aan <Pijl /></a>
         {
-          site.contact.telefoon && (
-            <a class="tekstlink" href={`tel:${site.contact.telefoon.replace(/\s/g, '')}`}>
-              Of bel {site.contact.telefoonWeergave ?? site.contact.telefoon}
+          telLink && (
+            <a class="tekstlink" href={telLink}>
+              Of bel {site.contact.telefoonWeergave}
             </a>
           )
         }
+        <button type="button" class="tekstlink slot__assistent" data-assistent-open aria-controls="assistent" aria-haspopup="dialog">Of vraag het de assistent</button>
       </div>
     </div>
     <Foto
@@ -39,12 +46,23 @@ const {
       sizes="(min-width: 900px) 40vw, 100vw"
       widths={[480, 800, 1200]}
       class="slot__beeld"
-      inspiratie={beeld.inspiratie ?? true}
+      inspiratie={beeld.inspiratie}
     />
   </div>
 </section>
 
 <style>
+  .slot__assistent {
+    background: none;
+    border: 0;
+    border-bottom: 1px solid currentColor;
+    border-radius: 0;
+    padding: 0 0 0.15rem;
+    font: inherit;
+    font-weight: 540;
+    color: inherit;
+    cursor: pointer;
+  }
   .slot {
     background: var(--wit);
     border-top: 1px solid var(--steen-licht);

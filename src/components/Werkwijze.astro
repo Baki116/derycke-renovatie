@@ -1,13 +1,11 @@
 ---
-import { site } from '../config/site';
-
 interface Props {
   titel?: string;
 }
 const { titel = 'Zo verloopt uw project' } = Astro.props;
 
 const stappen = [
-  { titel: 'Eerste contact', tekst: 'U beschrijft uw project via het formulier of telefonisch. Foto’s helpen ons om meteen een beeld te vormen.' },
+  { titel: 'Eerste contact', tekst: 'U beschrijft uw project via het formulier, de assistent, WhatsApp of telefonisch. Foto’s helpen om meteen een beeld te vormen.' },
   { titel: 'Gesprek over uw project', tekst: 'We bespreken uw wensen, de huidige toestand en wat u belangrijk vindt, indien nodig ter plaatse.' },
   { titel: 'Offerte', tekst: 'U ontvangt een duidelijke offerte met een omschrijving van de werken, zodat u weet waar u aan toe bent.' },
   { titel: 'Planning', tekst: 'Na uw akkoord leggen we samen de timing vast en stemmen we de volgorde van de werken af.' },
@@ -17,24 +15,28 @@ const stappen = [
 
 <section class="sectie werkwijze" aria-labelledby="werkwijze-titel">
   <div class="wrap">
-    <div class="werkwijze__kop">
-      <h2 id="werkwijze-titel">{titel}</h2>
+    <div class="werkwijze__kop" data-reveal>
+      <div>
+        <p class="nr">Werkwijze</p>
+        <h2 id="werkwijze-titel">{titel}</h2>
+      </div>
       <p class="zacht maat">Vijf duidelijke stappen, van uw eerste vraag tot de oplevering. U heeft telkens één aanspreekpunt.</p>
     </div>
 
+    <div class="werkwijze__baan" data-voortgang>
+    <span class="werkwijze__spoor" aria-hidden="true"><span class="werkwijze__vul"></span></span>
     <ol class="werkwijze__stappen">
       {
         stappen.map((s, i) => (
-          <li>
-            <span class="werkwijze__nr" aria-hidden="true">{i + 1}</span>
+          <li style={`--stap:${i / (stappen.length - 1)}`}>
+            <span class="werkwijze__nr" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
             <h3>{s.titel}</h3>
             <p class="zacht">{s.tekst}</p>
           </li>
         ))
       }
     </ol>
-
-    {site.demo && <p class="demo-melding werkwijze__demo">Voorgestelde werkwijze, af te stemmen op de werkelijke organisatie van Derycke.</p>}
+    </div>
   </div>
 </section>
 
@@ -46,6 +48,10 @@ const stappen = [
     align-items: end;
     margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
   }
+  .werkwijze__baan {
+    --voortgang: 0;
+    position: relative;
+  }
   .werkwijze__stappen {
     list-style: none;
     margin: 0;
@@ -55,15 +61,20 @@ const stappen = [
     gap: 2rem;
     position: relative;
   }
-  /* de afwerkingslijn als tijdslijn */
-  .werkwijze__stappen::before {
-    content: '';
+  .werkwijze__spoor {
     position: absolute;
+    top: 1.15rem;
     left: 0;
     right: 0;
-    top: 1.15rem;
     height: 1px;
+    background: var(--steen-licht);
+  }
+  .werkwijze__vul {
+    position: absolute;
+    inset: 0;
     background: var(--brons);
+    transform-origin: left center;
+    transform: scaleX(var(--voortgang));
   }
   .werkwijze__stappen li {
     position: relative;
@@ -75,13 +86,21 @@ const stappen = [
     width: 2.3rem;
     height: 2.3rem;
     margin-bottom: 1.4rem;
-    background: var(--kalk);
-    border: 1px solid var(--brons);
     border-radius: 50%;
-    font-size: var(--fs-1);
+    background: var(--kalk);
+    border: 1px solid var(--steen);
+    color: var(--steen-donker);
+    font-size: var(--fs-0);
     font-weight: 560;
     font-variant-numeric: tabular-nums;
-    color: var(--brons);
+    transition: border-color 0.4s var(--ease), color 0.4s var(--ease), background-color 0.4s var(--ease);
+  }
+  /* stap licht op zodra de lijn ze bereikt */
+  .werkwijze__stappen li .werkwijze__nr {
+    --aan: clamp(0, (var(--voortgang) - var(--stap)) * 100 + 1, 1);
+    border-color: color-mix(in srgb, var(--brons) calc(var(--aan) * 100%), var(--steen));
+    color: color-mix(in srgb, var(--kalk) calc(var(--aan) * 100%), var(--steen-donker));
+    background: color-mix(in srgb, var(--brons) calc(var(--aan) * 100%), var(--kalk));
   }
   .werkwijze h3 {
     font-size: 1.15rem;
@@ -89,9 +108,6 @@ const stappen = [
   }
   .werkwijze p {
     font-size: var(--fs-1);
-  }
-  .werkwijze__demo {
-    margin-top: 2.5rem;
   }
 
   @media (max-width: 960px) {
@@ -102,13 +118,17 @@ const stappen = [
       grid-template-columns: 1fr;
       gap: 0;
     }
-    .werkwijze__stappen::before {
+    .werkwijze__spoor {
       top: 0;
       bottom: 0;
       left: 1.15rem;
       right: auto;
       width: 1px;
       height: auto;
+    }
+    .werkwijze__vul {
+      transform-origin: center top;
+      transform: scaleY(var(--voortgang));
     }
     .werkwijze__stappen li {
       padding: 0 0 2rem 3.75rem;

@@ -1,14 +1,10 @@
 /**
  * ─────────────────────────────────────────────────────────────
- *  BEDRIJFSGEGEVENS — één centrale plek
+ *  BEDRIJFSGEGEVENS EN INSTELLINGEN — één centrale plek
  * ─────────────────────────────────────────────────────────────
- *  De contactgegevens staan in src/config/bedrijf.json en zijn ook
- *  aanpasbaar via het CMS op /admin/ (Instellingen → Bedrijfsgegevens). Een veld dat `null` is,
- *  wordt op de site getoond als "nog aan te vullen" (alleen in de
- *  demoversie) en wordt NIET opgenomen in de gestructureerde data.
- *
- *  Niets in dit bestand is verzonnen: ontbrekende gegevens blijven
- *  leeg tot Derycke ze bevestigt.
+ *  Contactgegevens: src/config/bedrijf.json
+ *  Merken:          src/config/merken.ts
+ *  Beelden:         src/data/beelden.ts
  */
 
 import bedrijf from './bedrijf.json';
@@ -22,19 +18,16 @@ export const site = {
   kortenaam: 'Derycke',
   slogan: 'Vakmanschap in elke afwerking.',
   regio: 'heel Vlaanderen',
-
-  /** Demoversie: toont labels bij inspiratiebeelden en lege gegevens, en blokkeert indexering. */
-  demo: true,
-
-  /** Zet op `true` zodra de site live mag en de inspiratiebeelden vervangen zijn. */
-  indexeerbaar: false,
+  domein: 'https://deryckerenovatie.be',
 
   contact: {
-    telefoon: waarde('telefoon'), // bv. '+32 470 00 00 00'
-    telefoonWeergave: waarde('telefoonWeergave'), // bv. '0470 00 00 00'
-    email: waarde('email'), // bv. 'info@derycke.be'
+    telefoon: waarde('telefoon'),
+    telefoonWeergave: waarde('telefoonWeergave'),
+    whatsapp: waarde('whatsapp'),
+    email: waarde('email'),
   },
 
+  /** Wettelijk adres: enkel in de wettelijke vermeldingen, niet als open werkplaats. */
   adres: {
     straat: waarde('straat'),
     postcode: waarde('postcode'),
@@ -42,18 +35,35 @@ export const site = {
   },
 
   onderneming: {
-    ondernemingsnummer: waarde('ondernemingsnummer'), // bv. 'BE 0123.456.789'
-    rechtsvorm: waarde('rechtsvorm'), // bv. 'BV'
+    ondernemingsnummer: waarde('ondernemingsnummer'),
+    rechtsvorm: waarde('rechtsvorm'),
   },
 
-  /** Wie de privacyverklaring onderschrijft (verwerkingsverantwoordelijke). */
-  privacyContact: waarde('privacyContact'),
+  /**
+   * Google-reviews: blijft verborgen tot er echte reviews zijn.
+   * Vul dan de link naar het Google-bedrijfsprofiel in en zet `tonen` op true.
+   */
+  reviews: {
+    tonen: false,
+    googleLink: null as string | null,
+  },
+
+  /** Antwoordtermijn op de bedankpagina (te bevestigen door Derycke). */
+  antwoordtermijn: 'binnen 1 werkdag',
 } as const;
 
-export const ontbreekt = 'nog aan te vullen';
+/** Productie = gekoppeld domein. Previews (vercel.app) worden nooit geïndexeerd. */
+export const isProductie = process.env.VERCEL_ENV === 'production' || process.env.INDEXEERBAAR === '1';
 
-export function heeftContact() {
-  return Boolean(site.contact.telefoon || site.contact.email);
+export const telLink = site.contact.telefoon ? `tel:${site.contact.telefoon}` : null;
+
+/** WhatsApp-link met een vooraf ingevuld bericht, optioneel per dienst. */
+export function whatsappLink(onderwerp?: string) {
+  if (!site.contact.whatsapp) return null;
+  const tekst = onderwerp
+    ? `Hallo Derycke, ik heb een vraag over ${onderwerp}: `
+    : 'Hallo Derycke, ik heb een vraag over een renovatieproject: ';
+  return `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(tekst)}`;
 }
 
 export const navigatie = [

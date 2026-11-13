@@ -1,0 +1,95 @@
+---
+/**
+ * Langzaam schuivende band met de merken waarmee Derycke werkt.
+ * Typografisch zolang er geen officieel logo in /public/merken/ staat.
+ */
+import { actieveMerken } from '../config/merken';
+const merken = actieveMerken;
+---
+
+<section class="merken" aria-labelledby="merken-titel">
+  <div class="wrap merken__kop" data-reveal>
+    <h2 id="merken-titel" class="merken__titel">Wij werken met professionele topmerken</h2>
+  </div>
+  <div class="merken__band" data-reveal>
+    <ul class="merken__rij">
+      {
+        merken.map((m) => (
+          <li>{m.logo ? <img src={m.logo} alt={m.naam} height="28" loading="lazy" /> : m.naam}</li>
+        ))
+      }
+    </ul>
+    <ul class="merken__rij" aria-hidden="true">
+      {merken.map((m) => <li>{m.logo ? <img src={m.logo} alt="" height="28" loading="lazy" /> : m.naam}</li>)}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .merken {
+    padding-block: clamp(3rem, 2rem + 3vw, 5rem);
+    border-bottom: 1px solid var(--steen-licht);
+    overflow: hidden;
+  }
+  .merken__kop {
+    margin-bottom: 2rem;
+  }
+  .merken__titel {
+    font-size: var(--fs-1);
+    font-weight: 560;
+    font-stretch: 100%;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--steen-donker);
+  }
+  .merken__band {
+    display: flex;
+    width: max-content;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .merken__rij {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: clamp(2.5rem, 5vw, 5rem);
+    padding: 0 clamp(1.25rem, 2.5vw, 2.5rem);
+    margin: 0;
+    animation: merken-schuif 48s linear infinite;
+  }
+  .merken__band:hover .merken__rij {
+    animation-play-state: paused;
+  }
+  .merken__rij li {
+    flex: none;
+    font-size: clamp(1.35rem, 1.1rem + 1vw, 2rem);
+    font-weight: 480;
+    font-stretch: 112%;
+    letter-spacing: -0.005em;
+    color: var(--steen-donker);
+    white-space: nowrap;
+  }
+  .merken__rij img {
+    height: 28px;
+    width: auto;
+    filter: grayscale(1) opacity(0.6);
+  }
+  @keyframes merken-schuif {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .merken__band {
+      width: auto;
+      mask-image: none;
+    }
+    .merken__rij {
+      animation: none;
+      flex-wrap: wrap;
+      gap: 1rem 2.5rem;
+    }
+    .merken__rij[aria-hidden='true'] {
+      display: none;
+    }
+  }
+</style>

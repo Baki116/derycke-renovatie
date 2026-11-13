@@ -5,7 +5,11 @@ import Foto from '../../components/Foto.astro';
 import Pijl from '../../components/Pijl.astro';
 import { diensten, type Dienst } from '../../data/diensten';
 import { kruimelSchema, faqSchema } from '../../lib/schema';
-import { site } from '../../config/site';
+import Werkwijze from '../../components/Werkwijze.astro';
+import VoorNa from '../../components/VoorNa.astro';
+import { whatsappLink, telLink, site } from '../../config/site';
+import { verfMerken } from '../../config/merken';
+import { voorNa } from '../../data/beelden';
 
 export function getStaticPaths() {
   return diensten.map((d) => ({ params: { slug: d.slug }, props: { dienst: d } }));
@@ -13,7 +17,17 @@ export function getStaticPaths() {
 
 const { dienst } = Astro.props as { dienst: Dienst };
 const andere = diensten.filter((d) => d.slug !== dienst.slug);
-const offerteLink = `/contact/?type=${encodeURIComponent(dienst.titel)}#offerte`;
+const offerteLink = `/contact/?dienst=${encodeURIComponent(dienst.titel)}#offerte`;
+const onderwerpen: Record<string, string> = {
+  schilderwerken: 'schilderwerken',
+  badkamerrenovaties: 'een badkamerrenovatie',
+  keukenrenovaties: 'een keukenrenovatie',
+  vloerwerken: 'vloerwerken',
+  'algemene-renovaties': 'een algemene renovatie',
+};
+const onderwerp = onderwerpen[dienst.slug];
+const wa = whatsappLink(onderwerp);
+const paar = dienst.slug === 'badkamerrenovaties' ? voorNa[1] : null;
 
 const schema = [
   kruimelSchema(Astro.site, [
@@ -32,20 +46,21 @@ const schema = [
 ];
 ---
 
-<Basis titel={dienst.seoTitel} omschrijving={dienst.seoOmschrijving} schema={schema}>
+<Basis titel={dienst.seoTitel} omschrijving={dienst.seoOmschrijving} schema={schema} onderwerp={onderwerp} dienst={dienst.titel}>
   <PaginaKop titel={dienst.titel.replace(/(Badkamer|Keuken)(renovaties)/, '$1\u00AD$2')} intro={dienst.intro} kruimels={[{ naam: 'Diensten', href: '/diensten/' }, { naam: dienst.titel }]}>
     <div class="acties">
       <a href={offerteLink} class="knop">Vraag een offerte voor {dienst.titel.toLowerCase()} <Pijl /></a>
+      {wa && <a href={wa} class="tekstlink" target="_blank" rel="noopener">Stel uw vraag via WhatsApp</a>}
     </div>
   </PaginaKop>
 
   <div class="wrap beelden">
-    <Foto src={dienst.beeld.src} alt={dienst.beeld.alt} sizes="(min-width: 900px) 55vw, 100vw" widths={[640, 960, 1400]} ratio="4 / 5" eager class="beelden__groot" />
+    <Foto src={dienst.beeld.src} alt={dienst.beeld.alt} sizes="(min-width: 900px) 55vw, 100vw" widths={[640, 960, 1400]} ratio="4 / 5" eager class="beelden__groot" zoom />
     <Foto src={dienst.detailbeeld.src} alt={dienst.detailbeeld.alt} sizes="(min-width: 900px) 38vw, 100vw" widths={[600, 900, 1200]} ratio="3 / 2" class="beelden__klein" />
   </div>
 
   <section class="sectie" aria-labelledby="wanneer">
-    <div class="wrap twee">
+    <div class="wrap twee" data-reveal>
       <h2 id="wanneer">Wanneer kiest u voor {dienst.titel.toLowerCase()}?</h2>
       <ul class="lijst">
         {dienst.wanneer.map((w) => <li>{w}</li>)}
@@ -55,8 +70,8 @@ const schema = [
 
   <section class="sectie werken" aria-labelledby="werken">
     <div class="wrap">
-      <h2 id="werken" class="werken__titel">Wat we uitvoeren</h2>
-      <dl class="werken__lijst">
+      <h2 id="werken" class="werken__titel" data-reveal>Wat we uitvoeren</h2>
+      <dl class="werken__lijst" data-reveal-groep>
         {
           dienst.werken.map((w) => (
             <div>
@@ -69,9 +84,45 @@ const schema = [
     </div>
   </section>
 
+  {
+    paar && (
+      <section class="sectie voorna" aria-labelledby="voorna">
+        <div class="wrap">
+          <h2 id="voorna" class="werken__titel" data-reveal>Voor en na</h2>
+          <div data-reveal>
+            <VoorNa voor={paar.voor} na={paar.na} titel={paar.titel} ratio="4 / 5" sizes="(min-width: 760px) 640px, 100vw" />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    dienst.slug === 'schilderwerken' && verfMerken.length > 0 && (
+      <section class="sectie merken" aria-labelledby="merken">
+        <div class="wrap twee">
+          <div data-reveal>
+            <h2 id="merken">Wij werken met professionele topmerken</h2>
+            <p class="zacht">De keuze van de verf hangt af van de ondergrond, de ruimte en de gewenste afwerking. We adviseren u graag.</p>
+          </div>
+          <dl class="merken__lijst" data-reveal-groep>
+            {verfMerken.map((m) => (
+              <div>
+                <dt>{m.naam}</dt>
+                <dd>{m.tekst}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+    )
+  }
+
+  <Werkwijze />
+
   <section class="sectie offerte-sectie" aria-labelledby="offerte-info">
     <div class="wrap">
-      <div class="paneel donker">
+      <div class="paneel donker" data-reveal>
         <div>
           <h2 id="offerte-info">Wat helpt voor een correcte offerte?</h2>
           <p class="zacht">Hoe meer we vooraf weten, hoe gerichter we uw aanvraag kunnen bekijken. Deze gegevens zijn handig, maar niet verplicht.</p>
@@ -80,7 +131,11 @@ const schema = [
           <ul class="lijst">
             {dienst.offerte.map((o) => <li>{o}</li>)}
           </ul>
-          <a href={offerteLink} class="knop knop--licht paneel__knop">Vraag uw vrijblijvende offerte aan <Pijl /></a>
+          <div class="paneel__acties">
+            <a href={offerteLink} class="knop knop--licht">Vraag uw vrijblijvende offerte aan <Pijl /></a>
+            {wa && <a href={wa} class="tekstlink" target="_blank" rel="noopener">WhatsApp</a>}
+            {telLink && <a href={telLink} class="tekstlink">Bel {site.contact.telefoonWeergave}</a>}
+          </div>
         </div>
       </div>
     </div>
@@ -89,7 +144,7 @@ const schema = [
   {
     dienst.faq.length > 0 && (
       <section class="sectie faq" aria-labelledby="faq">
-        <div class="wrap twee">
+        <div class="wrap twee" data-reveal>
           <h2 id="faq">Veelgestelde vragen</h2>
           <div class="faq__lijst">
             {dienst.faq.map((f) => (
@@ -122,7 +177,6 @@ const schema = [
           ))
         }
       </ul>
-      {site.demo && <p class="demo-melding andere__demo">Beelden op deze pagina zijn inspiratiebeelden.</p>}
     </div>
   </nav>
 </Basis>
@@ -193,8 +247,41 @@ const schema = [
     margin-bottom: 1.25rem;
     max-width: 16ch;
   }
-  .paneel__knop {
+  .paneel__acties {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.75rem;
     margin-top: 2rem;
+  }
+  .acties {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2rem;
+  }
+  .merken__lijst {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0 2rem;
+  }
+  .merken__lijst div {
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--steen-licht);
+  }
+  .merken__lijst dt {
+    font-weight: 560;
+    font-stretch: var(--breed);
+    margin-bottom: 0.25rem;
+  }
+  .merken__lijst dd {
+    margin: 0;
+    color: var(--steen-donker);
+    font-size: var(--fs-1);
+  }
+  .voorna :global(.vn) {
+    max-width: 40rem;
   }
   .faq {
     padding-top: 0;

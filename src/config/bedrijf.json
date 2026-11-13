@@ -1,11 +1,12 @@
 {
-  "telefoon": null,
-  "telefoonWeergave": null,
+  "telefoon": "+32470196253",
+  "telefoonWeergave": "+32 470 19 62 53",
+  "whatsapp": "32470196253",
   "email": "contact@deryckerenovatie.be",
-  "straat": null,
-  "postcode": null,
-  "gemeente": null,
-  "ondernemingsnummer": null,
+  "straat": "Houtemlaan 18",
+  "postcode": "9000",
+  "gemeente": "Gent",
+  "ondernemingsnummer": "BE 1035.985.932",
   "rechtsvorm": null,
   "privacyContact": null
 }

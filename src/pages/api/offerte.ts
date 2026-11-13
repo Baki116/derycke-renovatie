@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
-import { REGELS, TIMING, KLANTTYPE, isGeldigEmail, isGeldigTelefoon } from '../../lib/offerte-regels';
-import { typeWerken } from '../../data/diensten';
+import { REGELS, TIMING, KLANTTYPE, DIENSTKEUZES, isGeldigEmail, isGeldigTelefoon, isGeldigePostcode } from '../../lib/offerte-regels';
 
 export const prerender = false;
 
@@ -9,9 +8,10 @@ export const prerender = false;
  * Offerteaanvraag — serverzijde
  *
  * Vereiste omgevingsvariabelen (Vercel → Settings → Environment Variables):
- *   RESEND_API_KEY      API-sleutel van Resend
- *   OFFERTE_ONTVANGER   adres waar de aanvragen binnenkomen (bv. offerte@derycke.be)
- *   OFFERTE_AFZENDER    geverifieerd afzenderadres bij Resend (bv. "Website Derycke <website@derycke.be>")
+ *   RESEND_API_KEY   API-sleutel van Resend
+ *   OFFERTE_TO       adres(sen) waar de aanvragen binnenkomen, komma-gescheiden
+ *                    (tijdelijk info@flandershostassist.be, later contact@deryckerenovatie.be)
+ *   OFFERTE_FROM     geverifieerd afzenderadres bij Resend (bv. "Website Derycke <offerte@viewlaya.site>")
  *
  * Zolang één ervan ontbreekt, wordt NIETS verzonden en krijgt de bezoeker een duidelijke melding.
  */
@@ -58,8 +58,10 @@ function beeldType(buf: Uint8Array): string | null {
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   // 1. Configuratie
-  const { RESEND_API_KEY, OFFERTE_ONTVANGER, OFFERTE_AFZENDER } = process.env;
-  if (!RESEND_API_KEY || !OFFERTE_ONTVANGER || !OFFERTE_AFZENDER) {
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  const OFFERTE_TO = process.env.OFFERTE_TO || process.env.OFFERTE_ONTVANGER;
+  const OFFERTE_FROM = process.env.OFFERTE_FROM || process.env.OFFERTE_AFZENDER;
+  if (!RESEND_API_KEY || !OFFERTE_TO || !OFFERTE_FROM) {
     console.error('[offerte] Formulier niet geconfigureerd: ontbrekende omgevingsvariabelen.');
     return antwoord(request, 503, {
       ok: false,
@@ -99,18 +101,25 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     email: tekst('email', 160),
     telefoon: tekst('telefoon', 30),
     gemeente: tekst('gemeente', 80),
-    klanttype: tekst('klanttype', 40),
-    type: tekst('type', 60),
+    postcode: tekst('postcode', 4),
+    klanttype: tekst('klanttype', 60),
     timing: tekst('timing', 60),
     beschrijving: tekst('beschrijving', REGELS.maxBeschrijving),
+    akkoord: tekst('akkoord', 5),
+    bron: tekst('bron', 20) === 'assistent' ? 'Derycke-assistent (chat)' : 'Offerteformulier',
   };
+  const diensten = [...new Set(form.getAll('diensten').map((d) => String(d).trim()))].filter((d) =>
+    (DIENSTKEUZES as readonly string[]).includes(d),
+  );
 
   const velden: Record<string, string> = {};
   if (v.naam.length < 2) velden.naam = 'Vul uw naam in.';
   if (!isGeldigEmail(v.email)) velden.email = 'Vul een geldig e-mailadres in.';
-  if (v.telefoon && !isGeldigTelefoon(v.telefoon)) velden.telefoon = 'Vul een geldig telefoonnummer in.';
-  if (v.gemeente.length < 2) velden.gemeente = 'Vul de gemeente of postcode in.';
-  if (!(typeWerken as readonly string[]).includes(v.type)) velden.type = 'Kies het type werken.';
+  if (!isGeldigTelefoon(v.telefoon)) velden.telefoon = 'Vul een geldig telefoonnummer in.';
+  if (v.gemeente.length < 2) velden.gemeente = 'Vul de gemeente van het project in.';
+  if (v.postcode && !isGeldigePostcode(v.postcode)) velden.postcode = 'Vul een geldige postcode in.';
+  if (!diensten.length) velden.diensten = 'Kies minstens één soort werken.';
+  if (v.akkoord !== 'ja') velden.akkoord = 'Uw akkoord met de privacyverklaring is nodig.';
   if (v.timing && !(TIMING as readonly string[]).includes(v.timing)) velden.timing = 'Ongeldige timing.';
   if (v.klanttype && !(KLANTTYPE as readonly string[]).includes(v.klanttype)) velden.klanttype = 'Ongeldige keuze.';
   if (v.beschrijving.length < REGELS.minBeschrijving) velden.beschrijving = 'Beschrijf uw project iets uitgebreider.';
@@ -128,7 +137,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const bijlagen: { filename: string; content: Buffer; contentType: string }[] = [];
   for (const [i, f] of bestanden.entries()) {
     if (f.size > REGELS.maxBytesPerFoto) {
-      return antwoord(request, 422, { ok: false, fout: `De foto "${f.name}" is te groot (max. 3 MB per foto).` });
+      return antwoord(request, 422, { ok: false, fout: `De foto "${f.name}" is te groot (max. 3 MB per foto na verkleinen).` });
     }
     totaal += f.size;
     if (totaal > REGELS.maxBytesTotaal) {
@@ -148,11 +157,12 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     ['Naam', v.naam],
     ['E-mail', v.email],
     ['Telefoon', v.telefoon || '—'],
-    ['Gemeente / postcode', v.gemeente],
+    ['Gemeente', [v.postcode, v.gemeente].filter(Boolean).join(' ')],
     ['Klant', v.klanttype || '—'],
-    ['Type werken', v.type],
+    ['Werken', diensten.join(', ')],
     ['Gewenste timing', v.timing || '—'],
     ["Foto's", bijlagen.length ? `${bijlagen.length} als bijlage` : 'geen'],
+    ['Via', v.bron],
   ];
 
   const html = `
@@ -169,10 +179,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     const resend = new Resend(RESEND_API_KEY);
     const { error } = await resend.emails.send({
-      from: OFFERTE_AFZENDER,
-      to: OFFERTE_ONTVANGER.split(',').map((s) => s.trim()),
+      from: OFFERTE_FROM,
+      to: OFFERTE_TO.split(',').map((s) => s.trim()),
       replyTo: v.email,
-      subject: `Offerteaanvraag: ${v.type} in ${v.gemeente}`,
+      subject: `Offerteaanvraag: ${diensten.join(', ')} in ${v.gemeente}`,
       html,
       text: platteTekst,
       attachments: bijlagen.map((b) => ({ filename: b.filename, content: b.content, contentType: b.contentType })),

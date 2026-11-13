@@ -28,7 +28,7 @@ const isActief = (href: string) => pad === href || (href !== '/' && pad.startsWi
       </ul>
     </nav>
 
-    <a href="/contact/#offerte" class="knop kop__cta">Offerte aanvragen</a>
+    <a href="/contact/#offerte" class="knop kop__cta"><span class="cta-lang">Vraag uw vrijblijvende offerte aan</span><span class="cta-kort">Offerte aanvragen</span></a>
 
     <button class="kop__menuknop" type="button" aria-expanded="false" aria-controls="mobiel-menu" data-menuknop>
       <span class="kop__menulabel" data-menulabel>Menu</span>
@@ -67,12 +67,24 @@ const isActief = (href: string) => pad === href || (href !== '/' && pad.startsWi
   }
   .kop[data-gescrold] {
     border-bottom-color: var(--steen-licht);
+    box-shadow: 0 8px 30px -24px rgba(20, 22, 25, 0.45);
+  }
+  .kop[data-gescrold] .kop__binnen {
+    min-height: 3.9rem;
+  }
+  .kop :global(.logo) {
+    transition: transform 0.35s var(--ease);
+    transform-origin: left center;
+  }
+  .kop[data-gescrold] :global(.logo) {
+    transform: scale(0.9);
   }
   .kop__binnen {
     display: flex;
     align-items: center;
     gap: 2rem;
     min-height: 4.75rem;
+    transition: min-height 0.35s var(--ease);
   }
   .kop__logo {
     text-decoration: none;
@@ -115,6 +127,18 @@ const isActief = (href: string) => pad === href || (href !== '/' && pad.startsWi
   .kop__cta {
     min-height: 2.75rem;
     padding: 0.6rem 1.1rem;
+    white-space: nowrap;
+  }
+  .cta-kort {
+    display: none;
+  }
+  @media (max-width: 1280px) {
+    .cta-lang {
+      display: none;
+    }
+    .cta-kort {
+      display: inline;
+    }
   }
 
   .kop__menuknop {
@@ -221,6 +245,7 @@ const isActief = (href: string) => pad === href || (href !== '/' && pad.startsWi
     menu.hidden = !open;
     label.textContent = open ? 'Sluiten' : 'Menu';
     document.documentElement.style.overflow = open ? 'hidden' : '';
+    document.documentElement.toggleAttribute('data-scroll-stop', open);
   }
 
   knop?.addEventListener('click', () => zet(knop.getAttribute('aria-expanded') !== 'true'));

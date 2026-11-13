@@ -1,0 +1,372 @@
+---
+/**
+ * Derycke-assistent: begeleide chat met knoppen en vaste antwoorden (geen AI, geen kosten).
+ * Doel: vragen beantwoorden en een volledige offerteaanvraag doorsturen naar /api/offerte/
+ * (hetzelfde adres als het formulier).
+ */
+import { site, telLink, whatsappLink } from '../config/site';
+
+interface Props {
+  dienst?: string;
+}
+const { dienst } = Astro.props;
+---
+
+<div
+  id="assistent"
+  class="as"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="as-titel"
+  hidden
+  data-assistent
+  data-dienst={dienst}
+  data-wa={whatsappLink() ?? ''}
+  data-tel={telLink ?? ''}
+  data-tel-weergave={site.contact.telefoonWeergave ?? ''}
+  data-termijn={site.antwoordtermijn}
+>
+  <div class="as__kop">
+    <div class="as__id">
+      <span class="as__avatar" aria-hidden="true">D</span>
+      <div>
+        <h2 id="as-titel" class="as__titel">Derycke-assistent</h2>
+        <p class="as__sub">Automatische hulp · antwoordt meteen</p>
+      </div>
+    </div>
+    <button type="button" class="as__sluit" data-assistent-sluit aria-label="Assistent sluiten">
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M18 6 6 18" /></svg>
+    </button>
+  </div>
+
+  <div class="as__log" role="log" aria-live="polite" aria-relevant="additions" tabindex="0" aria-label="Gesprek" data-log></div>
+
+  <form class="as__invoer" data-invoer novalidate>
+    <label for="as-tekst" class="sr-only" data-invoer-label>Uw bericht</label>
+    <input id="as-tekst" type="text" autocomplete="off" maxlength="600" placeholder="Typ uw vraag…" data-tekst />
+    <button type="submit" class="as__stuur" aria-label="Versturen">
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h15M13 6l6 6-6 6" /></svg>
+    </button>
+  </form>
+  <p class="as__direct">
+    Liever rechtstreeks praten?{' '}
+    {whatsappLink() && <a href={whatsappLink()!} target="_blank" rel="noopener">WhatsApp</a>}
+    {telLink && <>{' · '}<a href={telLink}>Bellen</a></>}
+  </p>
+  <input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" multiple hidden data-as-fotos aria-label="Foto's kiezen" />
+</div>
+<div class="as__achter" hidden data-assistent-achter></div>
+
+<script>
+  import { initAssistent } from '../scripts/assistent';
+  initAssistent();
+</script>
+
+<style>
+  .as {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 80;
+    width: min(25rem, calc(100vw - 2rem));
+    height: min(40rem, calc(100svh - 2rem));
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    background: var(--wit);
+    color: var(--antraciet);
+    border: 1px solid var(--steen-licht);
+    border-radius: 6px;
+    box-shadow: 0 30px 80px -30px rgba(20, 22, 25, 0.55);
+    overflow: hidden;
+    transform-origin: bottom right;
+    animation: as-in 0.35s var(--ease) both;
+  }
+  .as[hidden] {
+    display: none;
+  }
+  @keyframes as-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+  .as__achter {
+    position: fixed;
+    inset: 0;
+    z-index: 79;
+    background: rgba(20, 22, 25, 0.25);
+  }
+  .as__achter[hidden] {
+    display: none;
+  }
+  .as__kop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 0.9rem 0.9rem 1.1rem;
+    background: var(--antraciet);
+    color: var(--kalk);
+  }
+  .as__id {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .as__avatar {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 1px solid var(--brons-licht);
+    border-radius: 50%;
+    font-weight: 620;
+    font-stretch: 125%;
+    color: var(--brons-licht);
+  }
+  .as__titel {
+    font-size: 1rem;
+    font-stretch: 110%;
+    letter-spacing: 0;
+  }
+  .as__sub {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--op-donker);
+  }
+  .as__sluit {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+  .as__sluit svg {
+    width: 1.3rem;
+  }
+  .as__sluit:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .as__log {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1.1rem 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    scroll-behavior: smooth;
+  }
+  .as__log:focus-visible {
+    outline-offset: -3px;
+  }
+  .as__log :global(.bericht) {
+    max-width: 88%;
+    padding: 0.7rem 0.9rem;
+    border-radius: 4px;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    animation: as-bericht 0.3s var(--ease) both;
+  }
+  @keyframes as-bericht {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  .as__log :global(.bericht p) {
+    margin: 0 0 0.5em;
+  }
+  .as__log :global(.bericht p:last-child) {
+    margin: 0;
+  }
+  .as__log :global(.bericht ul) {
+    margin: 0.3em 0 0.5em;
+    padding-left: 1.1rem;
+  }
+  .as__log :global(.bericht--bot) {
+    align-self: flex-start;
+    background: var(--kalk);
+    border: 1px solid var(--steen-licht);
+  }
+  .as__log :global(.bericht--ik) {
+    align-self: flex-end;
+    background: var(--antraciet);
+    color: var(--kalk);
+  }
+  .as__log :global(.keuzerij) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.1rem 0 0.4rem;
+  }
+  .as__log :global(.keuzerij button),
+  .as__log :global(.keuzerij a) {
+    min-height: 2.5rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--rand-veld);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--antraciet);
+    font: inherit;
+    font-size: 0.875rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .as__log :global(.keuzerij button:hover),
+  .as__log :global(.keuzerij a:hover) {
+    border-color: var(--antraciet);
+  }
+  .as__log :global(.keuzerij button[aria-pressed='true']) {
+    background: var(--antraciet);
+    border-color: var(--antraciet);
+    color: var(--kalk);
+  }
+  .as__log :global(.keuzerij .hoofd) {
+    background: var(--antraciet);
+    color: var(--kalk);
+    border-color: var(--antraciet);
+    font-weight: 560;
+  }
+  .as__log :global(.keuzerij button:disabled) {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .as__log :global(.samenvatting) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.2rem 0.75rem;
+    margin: 0.4rem 0 0.6rem;
+    font-size: 0.875rem;
+  }
+  .as__log :global(.samenvatting dt) {
+    color: var(--steen-donker);
+  }
+  .as__log :global(.samenvatting dd) {
+    margin: 0;
+    word-break: break-word;
+  }
+  .as__log :global(.akkoord) {
+    display: grid;
+    grid-template-columns: 1.3rem 1fr;
+    gap: 0.6rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    margin-top: 0.4rem;
+  }
+  .as__log :global(.akkoord input) {
+    width: 1.15rem;
+    height: 1.15rem;
+    margin: 0.1rem 0 0;
+    accent-color: var(--antraciet);
+  }
+  .as__log :global(.fotorij) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+  }
+  .as__log :global(.fotorij img),
+  .as__log :global(.fotorij span) {
+    width: 3rem;
+    height: 3rem;
+    object-fit: cover;
+    border-radius: 2px;
+    background: var(--steen-licht);
+    display: grid;
+    place-items: center;
+    font-size: 0.65rem;
+  }
+  .as__log :global(.fout) {
+    color: var(--fout);
+    font-weight: 520;
+  }
+  .as__log :global(.typen) {
+    display: inline-flex;
+    gap: 0.25rem;
+    padding: 0.85rem 1rem;
+  }
+  .as__log :global(.typen i) {
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: var(--steen);
+    animation: as-typen 1s infinite ease-in-out;
+  }
+  .as__log :global(.typen i:nth-child(2)) {
+    animation-delay: 0.15s;
+  }
+  .as__log :global(.typen i:nth-child(3)) {
+    animation-delay: 0.3s;
+  }
+  @keyframes as-typen {
+    50% {
+      opacity: 0.3;
+      transform: translateY(-2px);
+    }
+  }
+  .as__invoer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    padding: 0.75rem 0.9rem;
+    border-top: 1px solid var(--steen-licht);
+    background: #fff;
+  }
+  .as__invoer input {
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--rand-veld);
+    border-radius: 3px;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--antraciet);
+    background: #fff;
+  }
+  .as__invoer input:focus-visible {
+    outline: 2px solid var(--brons);
+    outline-offset: 1px;
+  }
+  .as__stuur {
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    place-items: center;
+    background: var(--antraciet);
+    color: var(--kalk);
+    border: 0;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .as__stuur svg {
+    width: 1.2rem;
+  }
+  .as__direct {
+    margin: 0;
+    padding: 0.55rem 1rem 0.75rem;
+    background: #fff;
+    font-size: 0.8125rem;
+    color: var(--steen-donker);
+  }
+  .as__direct a {
+    color: var(--antraciet);
+    font-weight: 560;
+  }
+  @media (max-width: 560px) {
+    .as {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      border-radius: 0;
+      border: 0;
+    }
+  }
+</style>

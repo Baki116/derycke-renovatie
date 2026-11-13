@@ -1,6 +1,6 @@
 ---
-import { typeWerken } from '../data/diensten';
-import { REGELS, TIMING, KLANTTYPE } from '../lib/offerte-regels';
+import { REGELS, TIMING, KLANTTYPE, DIENSTKEUZES } from '../lib/offerte-regels';
+import { mb } from '../lib/fotos';
 
 const fout = Astro.url.searchParams.get('fout');
 ---
@@ -14,13 +14,13 @@ const fout = Astro.url.searchParams.get('fout');
   data-offerte
   aria-describedby="of-uitleg"
 >
-  <p id="of-uitleg" class="of__uitleg zacht">Velden met <span aria-hidden="true">*</span><span class="sr-only">een sterretje</span> zijn verplicht.</p>
+  <p id="of-uitleg" class="of__uitleg zacht">Velden met <span aria-hidden="true">*</span><span class="sr-only">een sterretje</span> zijn verplicht. Uw aanvraag is gratis en vrijblijvend.</p>
 
   {
     fout && (
       <div class="of__melding of__melding--fout" role="alert">
         <p>
-          <strong>Uw aanvraag is niet verzonden.</strong> {decodeURIComponent(fout)}
+          <strong>Uw aanvraag is niet verzonden.</strong> {fout}
         </p>
       </div>
     )
@@ -32,88 +32,82 @@ const fout = Astro.url.searchParams.get('fout');
   </div>
 
   <fieldset class="of__groep">
-    <legend>Uw gegevens</legend>
-    <div class="of__rij of__rij--2">
-      <div class="veld">
-        <label for="naam">Naam <span aria-hidden="true">*</span></label>
-        <input id="naam" name="naam" type="text" autocomplete="name" required maxlength="120" />
-        <p class="veld__fout" id="naam-fout" hidden></p>
-      </div>
-      <div class="veld">
-        <label for="email">E-mailadres <span aria-hidden="true">*</span></label>
-        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="160" />
-        <p class="veld__fout" id="email-fout" hidden></p>
-      </div>
-    </div>
-    <div class="of__rij of__rij--2">
-      <div class="veld">
-        <label for="telefoon">Telefoonnummer <span class="veld__opt">(optioneel)</span></label>
-        <input id="telefoon" name="telefoon" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" aria-describedby="telefoon-hulp" />
-        <p class="veld__hulp" id="telefoon-hulp">Handig als we snel iets willen verduidelijken.</p>
-        <p class="veld__fout" id="telefoon-fout" hidden></p>
-      </div>
-      <div class="veld">
-        <label for="gemeente">Gemeente of postcode van het project <span aria-hidden="true">*</span></label>
-        <input id="gemeente" name="gemeente" type="text" autocomplete="address-level2" required maxlength="80" />
-        <p class="veld__fout" id="gemeente-fout" hidden></p>
-      </div>
-    </div>
+    <legend><span class="of__nr" aria-hidden="true">01</span> Uw project</legend>
+
     <div class="veld">
-      <span class="veld__label" id="klant-label">U bent <span class="veld__opt">(optioneel)</span></span>
-      <div class="keuzes" role="radiogroup" aria-labelledby="klant-label" data-klanttype>
+      <span class="veld__label" id="klanttype-label">U bent <span aria-hidden="true">*</span></span>
+      <div class="keuzes" role="radiogroup" aria-labelledby="klanttype-label" aria-required="true" id="klanttype" tabindex="-1">
         {
-          KLANTTYPE.map((k) => (
+          KLANTTYPE.map((k, i) => (
             <label class="keuze">
-              <input type="radio" name="klanttype" value={k} />
+              <input type="radio" name="klanttype" value={k} checked={i === 0} />
               <span>{k}</span>
             </label>
           ))
         }
       </div>
     </div>
-  </fieldset>
 
-  <fieldset class="of__groep">
-    <legend>Uw project</legend>
-    <div class="of__rij of__rij--2">
+    <div class="veld">
+      <span class="veld__label" id="diensten-label">Welke werken? <span aria-hidden="true">*</span> <span class="veld__opt">(meerdere keuzes mogelijk)</span></span>
+      <div class="keuzes" role="group" aria-labelledby="diensten-label" id="diensten" tabindex="-1" data-diensten-keuze>
+        {
+          DIENSTKEUZES.map((d) => (
+            <label class="keuze keuze--vink">
+              <input type="checkbox" name="diensten" value={d} />
+              <span>{d}</span>
+            </label>
+          ))
+        }
+      </div>
+      <p class="veld__fout" id="diensten-fout" hidden></p>
+    </div>
+
+    <div class="of__rij of__rij--gem">
       <div class="veld">
-        <label for="type">Type werken <span aria-hidden="true">*</span></label>
-        <div class="select">
-          <select id="type" name="type" required data-type-select>
-            <option value="">Kies een type werken</option>
-            {typeWerken.map((t) => <option value={t}>{t}</option>)}
-          </select>
-        </div>
-        <p class="veld__fout" id="type-fout" hidden></p>
+        <label for="gemeente">Gemeente van het project <span aria-hidden="true">*</span></label>
+        <input id="gemeente" name="gemeente" type="text" autocomplete="address-level2" required maxlength="80" />
+        <p class="veld__fout" id="gemeente-fout" hidden></p>
       </div>
       <div class="veld">
-        <label for="timing">Gewenste timing <span class="veld__opt">(optioneel)</span></label>
-        <div class="select">
-          <select id="timing" name="timing">
-            <option value="">Geen voorkeur</option>
-            {TIMING.map((t) => <option value={t}>{t}</option>)}
-          </select>
-        </div>
+        <label for="postcode">Postcode <span aria-hidden="true">*</span></label>
+        <input id="postcode" name="postcode" type="text" inputmode="numeric" autocomplete="postal-code" required maxlength="4" pattern="[1-9][0-9]{3}" />
+        <p class="veld__fout" id="postcode-fout" hidden></p>
       </div>
     </div>
+
     <div class="veld">
       <label for="beschrijving">Beschrijving van uw project <span aria-hidden="true">*</span></label>
       <textarea
         id="beschrijving"
         name="beschrijving"
-        rows="6"
+        rows="5"
         required
         minlength={REGELS.minBeschrijving}
         maxlength={REGELS.maxBeschrijving}
         aria-describedby="beschrijving-hulp"></textarea>
       <p class="veld__hulp" id="beschrijving-hulp">
-        Bijvoorbeeld: welke ruimtes, de geschatte oppervlakte, de huidige toestand en wat u wilt bereiken.
+        Bijvoorbeeld: welke ruimtes, de geschatte oppervlakte in m², de huidige toestand en wat u wilt bereiken.
       </p>
       <p class="veld__fout" id="beschrijving-fout" hidden></p>
     </div>
 
     <div class="veld">
-      <span class="veld__label" id="fotos-label">Foto's <span class="veld__opt">(optioneel)</span></span>
+      <span class="veld__label" id="timing-label">Gewenste timing <span class="veld__opt">(optioneel)</span></span>
+      <div class="keuzes" role="radiogroup" aria-labelledby="timing-label">
+        {
+          TIMING.map((t) => (
+            <label class="keuze">
+              <input type="radio" name="timing" value={t} />
+              <span>{t}</span>
+            </label>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="veld">
+      <span class="veld__label" id="fotos-label">Foto's <span class="veld__opt">(optioneel, sterk aanbevolen)</span></span>
       <div class="upload" data-upload>
         <input
           id="fotos"
@@ -126,13 +120,37 @@ const fout = Astro.url.searchParams.get('fout');
           aria-describedby="fotos-hulp"
           data-fotos
         />
-        <label for="fotos" class="upload__knop" id="fotos-knop">Foto's toevoegen</label>
+        <label for="fotos" class="upload__knop" id="fotos-knop">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></svg>
+          Foto's toevoegen
+        </label>
         <p class="veld__hulp" id="fotos-hulp">
-          Maximaal {REGELS.maxFotos} foto's in JPG, PNG, WebP of HEIC. Grote foto's worden vóór verzending automatisch verkleind.
+          Tot {REGELS.maxFotos} foto's (JPG, PNG, WebP of HEIC, max. {mb(REGELS.maxBytesOrigineel)} per foto). Ze worden vóór verzending automatisch verkleind.
         </p>
         <ul class="upload__lijst" data-fotolijst aria-live="polite"></ul>
       </div>
       <p class="veld__fout" id="fotos-fout" hidden></p>
+    </div>
+  </fieldset>
+
+  <fieldset class="of__groep">
+    <legend><span class="of__nr" aria-hidden="true">02</span> Uw gegevens</legend>
+    <div class="veld">
+      <label for="naam">Naam <span aria-hidden="true">*</span></label>
+      <input id="naam" name="naam" type="text" autocomplete="name" required maxlength="120" />
+      <p class="veld__fout" id="naam-fout" hidden></p>
+    </div>
+    <div class="of__rij of__rij--2">
+      <div class="veld">
+        <label for="telefoon">Telefoonnummer <span aria-hidden="true">*</span></label>
+        <input id="telefoon" name="telefoon" type="tel" autocomplete="tel" inputmode="tel" required maxlength="30" />
+        <p class="veld__fout" id="telefoon-fout" hidden></p>
+      </div>
+      <div class="veld">
+        <label for="email">E-mailadres <span aria-hidden="true">*</span></label>
+        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="160" />
+        <p class="veld__fout" id="email-fout" hidden></p>
+      </div>
     </div>
   </fieldset>
 
@@ -142,11 +160,18 @@ const fout = Astro.url.searchParams.get('fout');
     <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
   </div>
   <input type="hidden" name="gestart" value="" data-gestart />
+  <input type="hidden" name="bron" value="formulier" />
 
-  <p class="of__privacy zacht">
-    We gebruiken uw gegevens en foto's enkel om uw aanvraag te beantwoorden en een offerte op te maken. Meer informatie
-    leest u in onze <a href="/privacyverklaring/">privacyverklaring</a>.
-  </p>
+  <div class="veld of__akkoord">
+    <label class="vink">
+      <input type="checkbox" name="akkoord" value="ja" id="akkoord" required />
+      <span>
+        Ik ga akkoord dat Derycke mijn gegevens en foto's gebruikt om mijn aanvraag te beantwoorden, zoals beschreven in de
+        <a href="/privacyverklaring/">privacyverklaring</a>. <span aria-hidden="true">*</span>
+      </span>
+    </label>
+    <p class="veld__fout" id="akkoord-fout" hidden></p>
+  </div>
 
   <div class="of__verzend">
     <button type="submit" class="knop of__knop" data-verzendknop>
@@ -156,20 +181,12 @@ const fout = Astro.url.searchParams.get('fout');
     <p class="of__status" role="status" aria-live="polite" data-status></p>
   </div>
 
-  <div class="of__melding of__melding--fout" role="alert" hidden data-serverfout></div>
+  <div class="of__melding of__melding--fout" role="alert" tabindex="-1" hidden data-serverfout></div>
 </form>
 
-<div class="of__bevestiging" hidden tabindex="-1" data-bevestiging>
-  <span class="lijn" aria-hidden="true"></span>
-  <h3>Bedankt, uw aanvraag is verzonden.</h3>
-  <p>
-    We hebben uw offerteaanvraag goed ontvangen en nemen contact met u op om uw project te bespreken.
-  </p>
-  <p class="zacht" data-bevestiging-fotos></p>
-</div>
-
 <script>
-  import { REGELS, isGeldigEmail, isGeldigTelefoon } from '../lib/offerte-regels';
+  import { REGELS, DIENSTKEUZES, isGeldigEmail, isGeldigTelefoon, isGeldigePostcode } from '../lib/offerte-regels';
+  import { voegFotosToe, voorbeeldUrl, mb } from '../lib/fotos';
 
   const form = document.querySelector<HTMLFormElement>('[data-offerte]');
   if (form) init(form);
@@ -178,13 +195,18 @@ const fout = Astro.url.searchParams.get('fout');
     const gestart = form.querySelector<HTMLInputElement>('[data-gestart]')!;
     gestart.value = String(Date.now());
 
-    // Type werken voorselecteren via ?type=
+    // Dienst en klanttype voorselecteren via ?dienst= en ?klant=
     const params = new URLSearchParams(location.search);
-    const typeParam = params.get('type');
-    const select = form.querySelector<HTMLSelectElement>('[data-type-select]')!;
-    if (typeParam && [...select.options].some((o) => o.value === typeParam)) select.value = typeParam;
-    if (params.get('klant') === 'professioneel') {
-      const r = form.querySelector<HTMLInputElement>('input[name="klanttype"][value="Bedrijf"]');
+    const dienstParam = params.get('dienst') ?? params.get('type');
+    if (dienstParam) {
+      const passend = DIENSTKEUZES.find((d) => d.toLowerCase() === dienstParam.toLowerCase());
+      const vak = passend && form.querySelector<HTMLInputElement>(`input[name="diensten"][value="${passend}"]`);
+      if (vak) vak.checked = true;
+    }
+    const klant = params.get('klant');
+    if (klant) {
+      const waarde = klant === 'vastgoed' ? 'Vastgoedkantoor of projectontwikkelaar' : klant === 'bedrijf' ? 'Bedrijf' : null;
+      const r = waarde && form.querySelector<HTMLInputElement>(`input[name="klanttype"][value="${waarde}"]`);
       if (r) r.checked = true;
     }
 
@@ -192,44 +214,48 @@ const fout = Astro.url.searchParams.get('fout');
     const fotoInput = form.querySelector<HTMLInputElement>('[data-fotos]')!;
     const fotoLijst = form.querySelector<HTMLUListElement>('[data-fotolijst]')!;
     let fotos: File[] = [];
+    const urls = new Map<File, string | null>();
 
     fotoInput.addEventListener('change', async () => {
       const nieuw = [...(fotoInput.files ?? [])];
       fotoInput.value = '';
       zetFout('fotos', '');
-      const ruimte = REGELS.maxFotos - fotos.length;
-      if (nieuw.length > ruimte) {
-        zetFout('fotos', `U kunt maximaal ${REGELS.maxFotos} foto's toevoegen. ${ruimte > 0 ? `Er is nog plaats voor ${ruimte}.` : ''}`);
-      }
-      for (const f of nieuw.slice(0, Math.max(0, ruimte))) {
-        const isBeeld = (REGELS.toegelatenTypes as readonly string[]).includes(f.type) || /\.(heic|heif)$/i.test(f.name);
-        if (!isBeeld) {
-          zetFout('fotos', `"${f.name}" is geen ondersteund beeldformaat. Gebruik JPG, PNG, WebP of HEIC.`);
-          continue;
-        }
-        fotos.push(await verklein(f));
-      }
-      if (totaal() > REGELS.maxBytesTotaal) {
-        zetFout('fotos', `De foto's zijn samen te groot (max. ${mb(REGELS.maxBytesTotaal)}). Verwijder er één of meer.`);
-      }
+      const r = await voegFotosToe(fotos, nieuw);
+      fotos = r.fotos;
+      if (r.fout) zetFout('fotos', r.fout);
       tekenLijst();
     });
-
-    function totaal() {
-      return fotos.reduce((s, f) => s + f.size, 0);
-    }
 
     function tekenLijst() {
       fotoLijst.innerHTML = '';
       fotos.forEach((f, i) => {
+        if (!urls.has(f)) urls.set(f, voorbeeldUrl(f));
         const li = document.createElement('li');
+        const url = urls.get(f);
+        if (url) {
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = '';
+          img.width = 56;
+          img.height = 56;
+          li.append(img);
+        } else {
+          const ph = document.createElement('span');
+          ph.className = 'upload__ph';
+          ph.textContent = 'HEIC';
+          li.append(ph);
+        }
         const naam = document.createElement('span');
+        naam.className = 'upload__naam';
         naam.textContent = `${f.name} (${mb(f.size)})`;
         const weg = document.createElement('button');
         weg.type = 'button';
         weg.textContent = 'Verwijderen';
         weg.setAttribute('aria-label', `${f.name} verwijderen`);
         weg.addEventListener('click', () => {
+          const u = urls.get(f);
+          if (u) URL.revokeObjectURL(u);
+          urls.delete(f);
           fotos.splice(i, 1);
           zetFout('fotos', '');
           tekenLijst();
@@ -240,43 +266,36 @@ const fout = Astro.url.searchParams.get('fout');
       });
     }
 
-    async function verklein(f: File): Promise<File> {
-      try {
-        const bmp = await createImageBitmap(f);
-        const schaal = Math.min(1, REGELS.maxPixels / Math.max(bmp.width, bmp.height));
-        if (schaal === 1 && f.size <= 1.2 * 1024 * 1024 && f.type !== 'image/heic' && f.type !== 'image/heif') return f;
-        const c = document.createElement('canvas');
-        c.width = Math.round(bmp.width * schaal);
-        c.height = Math.round(bmp.height * schaal);
-        c.getContext('2d')!.drawImage(bmp, 0, 0, c.width, c.height);
-        const blob = await new Promise<Blob | null>((r) => c.toBlob(r, 'image/jpeg', 0.82));
-        if (!blob) return f;
-        return new File([blob], f.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
-      } catch {
-        // Browser kan dit formaat niet lezen (bv. HEIC buiten Safari): origineel behouden
-        return f;
-      }
-    }
-
     // ── Validatie ──────────────────────────────────────
-    const velden: Record<string, (v: string) => string> = {
-      naam: (v) => (v.trim().length < 2 ? 'Vul uw naam in.' : ''),
-      email: (v) => (!v.trim() ? 'Vul uw e-mailadres in.' : !isGeldigEmail(v) ? 'Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.be.' : ''),
-      telefoon: (v) => (v.trim() && !isGeldigTelefoon(v) ? 'Vul een geldig telefoonnummer in, bijvoorbeeld 0470 12 34 56.' : ''),
-      gemeente: (v) => (v.trim().length < 2 ? 'Vul de gemeente of postcode van het project in.' : ''),
-      type: (v) => (!v ? 'Kies het type werken.' : ''),
-      beschrijving: (v) =>
-        v.trim().length < REGELS.minBeschrijving
+    const waarde = (n: string) => (form.elements.namedItem(n) as HTMLInputElement | null)?.value ?? '';
+    const gekozenDiensten = () => [...form.querySelectorAll<HTMLInputElement>('input[name="diensten"]:checked')];
+    const velden: Record<string, () => string> = {
+      diensten: () => (gekozenDiensten().length ? '' : 'Kies minstens één soort werken.'),
+      gemeente: () => (waarde('gemeente').trim().length < 2 ? 'Vul de gemeente van het project in.' : ''),
+      postcode: () => (!isGeldigePostcode(waarde('postcode')) ? 'Vul een geldige Belgische postcode in, bijvoorbeeld 9000.' : ''),
+      beschrijving: () =>
+        waarde('beschrijving').trim().length < REGELS.minBeschrijving
           ? `Beschrijf uw project in minstens ${REGELS.minBeschrijving} tekens.`
           : '',
+      naam: () => (waarde('naam').trim().length < 2 ? 'Vul uw naam in.' : ''),
+      telefoon: () => (!isGeldigTelefoon(waarde('telefoon')) ? 'Vul een geldig telefoonnummer in, bijvoorbeeld 0470 12 34 56.' : ''),
+      email: () =>
+        !waarde('email').trim()
+          ? 'Vul uw e-mailadres in.'
+          : !isGeldigEmail(waarde('email'))
+            ? 'Vul een geldig e-mailadres in, bijvoorbeeld naam@voorbeeld.be.'
+            : '',
+      akkoord: () => ((form.elements.namedItem('akkoord') as HTMLInputElement).checked ? '' : 'Vink het akkoord aan zodat we uw aanvraag mogen beantwoorden.'),
     };
     const labels: Record<string, string> = {
-      naam: 'Naam',
-      email: 'E-mailadres',
-      telefoon: 'Telefoonnummer',
-      gemeente: 'Gemeente of postcode',
-      type: 'Type werken',
+      diensten: 'Welke werken',
+      gemeente: 'Gemeente',
+      postcode: 'Postcode',
       beschrijving: 'Beschrijving',
+      naam: 'Naam',
+      telefoon: 'Telefoonnummer',
+      email: 'E-mailadres',
+      akkoord: 'Akkoord',
       fotos: "Foto's",
     };
 
@@ -300,22 +319,25 @@ const fout = Astro.url.searchParams.get('fout');
     }
 
     function controleer(naam: string) {
-      const el = form.elements.namedItem(naam) as HTMLInputElement | null;
-      if (!el || !velden[naam]) return '';
-      const fout = velden[naam](el.value);
+      const fout = velden[naam]?.() ?? '';
       zetFout(naam, fout);
       return fout;
     }
 
     Object.keys(velden).forEach((naam) => {
-      const el = form.elements.namedItem(naam) as HTMLInputElement | null;
-      el?.addEventListener('blur', () => {
+      const el = form.querySelector<HTMLInputElement>(`#${naam}`);
+      if (!el || naam === 'diensten') return;
+      el.addEventListener('blur', () => {
         if (el.value || el.getAttribute('aria-invalid')) controleer(naam);
       });
-      el?.addEventListener('input', () => {
+      el.addEventListener('input', () => {
         if (el.getAttribute('aria-invalid')) controleer(naam);
       });
     });
+    form.querySelector('[data-diensten-keuze]')?.addEventListener('change', () => {
+      if (form.querySelector('#diensten')?.getAttribute('aria-invalid')) controleer('diensten');
+    });
+    form.querySelector('#akkoord')?.addEventListener('change', () => controleer('akkoord'));
 
     // ── Verzenden ──────────────────────────────────────
     const foutlijst = form.querySelector<HTMLElement>('[data-foutlijst]')!;
@@ -323,7 +345,6 @@ const fout = Astro.url.searchParams.get('fout');
     const knopTekst = form.querySelector<HTMLElement>('[data-knoptekst]')!;
     const status = form.querySelector<HTMLElement>('[data-status]')!;
     const serverFout = form.querySelector<HTMLElement>('[data-serverfout]')!;
-    const bevestiging = document.querySelector<HTMLElement>('[data-bevestiging]')!;
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -332,7 +353,8 @@ const fout = Astro.url.searchParams.get('fout');
       const fouten = Object.keys(velden)
         .map((n) => [n, controleer(n)] as const)
         .filter(([, f]) => f);
-      if (totaal() > REGELS.maxBytesTotaal) fouten.push(['fotos', `De foto's zijn samen te groot (max. ${mb(REGELS.maxBytesTotaal)}).`]);
+      const totaal = fotos.reduce((s, f) => s + f.size, 0);
+      if (totaal > REGELS.maxBytesTotaal) fouten.push(['fotos', `De foto's zijn samen te groot (max. ${mb(REGELS.maxBytesTotaal)}).`]);
 
       if (fouten.length) {
         const ul = foutlijst.querySelector('ul')!;
@@ -344,7 +366,9 @@ const fout = Astro.url.searchParams.get('fout');
           a.textContent = `${labels[n]}: ${f}`;
           a.addEventListener('click', (ev) => {
             ev.preventDefault();
-            (form.querySelector(`#${n}`) as HTMLElement | null)?.focus();
+            const doel = form.querySelector<HTMLElement>(`#${n}`);
+            const focusbaar = doel?.matches('input, textarea') ? doel : doel?.querySelector<HTMLElement>('input');
+            focusbaar?.focus();
           });
           li.append(a);
           ul.append(li);
@@ -354,19 +378,6 @@ const fout = Astro.url.searchParams.get('fout');
         return;
       }
       foutlijst.hidden = true;
-
-      // Statische voorbeeldversie (zonder server): duidelijk melden dat er niets verzonden wordt
-      if (form.hasAttribute('data-voorbeeld')) {
-        serverFout.innerHTML = '';
-        const p = document.createElement('p');
-        const s = document.createElement('strong');
-        s.textContent = 'Voorbeeldversie: er werd niets verzonden. ';
-        p.append(s, document.createTextNode('Het formulier werkt correct. In de definitieve website komt uw aanvraag rechtstreeks in uw mailbox terecht.'));
-        serverFout.append(p);
-        serverFout.classList.add('of__melding--info');
-        serverFout.hidden = false;
-        return;
-      }
 
       const data = new FormData(form);
       data.delete('fotos');
@@ -383,12 +394,8 @@ const fout = Astro.url.searchParams.get('fout');
         if (!res.ok || !json?.ok) {
           throw new Error(json?.fout || 'Er ging iets mis bij het verzenden. Probeer het later opnieuw.');
         }
-        form.hidden = true;
-        const fotoTekst = bevestiging.querySelector<HTMLElement>('[data-bevestiging-fotos]')!;
-        fotoTekst.textContent = fotos.length ? `Met ${fotos.length} foto${fotos.length > 1 ? "'s" : ''} als bijlage.` : '';
-        bevestiging.hidden = false;
-        bevestiging.focus();
-        bevestiging.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        status.textContent = 'Uw aanvraag is verzonden.';
+        location.href = `/contact/bedankt/?fotos=${fotos.length}`;
       } catch (err) {
         const bericht =
           err instanceof TypeError
@@ -402,17 +409,12 @@ const fout = Astro.url.searchParams.get('fout');
         serverFout.append(p);
         serverFout.hidden = false;
         status.textContent = '';
-        serverFout.focus?.();
-      } finally {
+        serverFout.focus();
         knop.disabled = false;
         knop.classList.remove('is-bezig');
         knopTekst.textContent = 'Offerteaanvraag versturen';
       }
     });
-  }
-
-  function mb(b: number) {
-    return b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1).replace('.', ',')} MB` : `${Math.max(1, Math.round(b / 1024))} kB`;
   }
 </script>
 
@@ -715,6 +717,77 @@ const fout = Astro.url.searchParams.get('fout');
     .of__knop {
       width: 100%;
       min-width: 0;
+    }
+  }
+
+  .of__nr {
+    display: inline-block;
+    min-width: 2.2rem;
+    color: var(--brons);
+    font-variant-numeric: tabular-nums;
+    font-weight: 560;
+  }
+  .of__rij--gem {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 9rem;
+    gap: 1.25rem;
+  }
+  .keuze--vink span::before {
+    content: '';
+    width: 0.9rem;
+    height: 0.9rem;
+    margin-right: 0.55rem;
+    border: 1px solid currentColor;
+    border-radius: 1px;
+    flex: none;
+    transition: background-color 0.15s;
+  }
+  .keuze--vink input:checked + span::before {
+    background: var(--brons-licht) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='%2324272b' stroke-width='1.6'/%3E%3C/svg%3E") center / 80% no-repeat;
+    border-color: var(--brons-licht);
+  }
+  .vink {
+    display: grid;
+    grid-template-columns: 1.4rem 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    font-size: var(--fs-1);
+    font-weight: 400;
+    cursor: pointer;
+  }
+  .vink input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0.15rem 0 0;
+    accent-color: var(--antraciet);
+  }
+  .of__akkoord {
+    margin-top: 0.5rem;
+  }
+  .upload__knop svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  .upload__lijst :global(img),
+  .upload__lijst :global(.upload__ph) {
+    width: 3.5rem;
+    height: 3.5rem;
+    object-fit: cover;
+    flex: none;
+    border-radius: 2px;
+    background: var(--steen-licht);
+    display: grid;
+    place-items: center;
+    font-size: 0.7rem;
+    color: var(--steen-donker);
+  }
+  .upload__lijst :global(.upload__naam) {
+    flex: 1;
+    min-width: 0;
+  }
+  @media (max-width: 560px) {
+    .of__rij--gem {
+      grid-template-columns: 1fr;
     }
   }
 </style>
