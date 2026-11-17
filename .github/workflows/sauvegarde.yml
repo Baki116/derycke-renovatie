@@ -1,0 +1,25 @@
+# Abonnement Viewlaya : dagelijkse back-up (broncode + inhoud), 30 dagen bewaard.
+name: Dagelijkse back-up
+on:
+  schedule:
+    - cron: '19 2 * * *'
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/sauvegarde.yml']
+permissions:
+  contents: read
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archief
+        run: |
+          d=$(date -u +%Y-%m-%d)
+          zip -qr "derycke-renovatie-$d.zip" . -x '.git/*' 'node_modules/*' 'dist/*'
+          echo "NAAM=derycke-renovatie-$d" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAAM }}
+          path: ${{ env.NAAM }}.zip
+          retention-days: 30

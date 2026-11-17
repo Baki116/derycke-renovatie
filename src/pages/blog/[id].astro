@@ -1,0 +1,87 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Basis from '../../layouts/Basis.astro';
+import PaginaKop from '../../components/PaginaKop.astro';
+import Foto from '../../components/Foto.astro';
+import Pijl from '../../components/Pijl.astro';
+import OfferteSlot from '../../components/OfferteSlot.astro';
+import { diensten } from '../../data/diensten';
+import { kruimelSchema } from '../../lib/schema';
+
+export async function getStaticPaths() {
+  const items = await getCollection('blog', (a) => a.data.status === 'gepubliceerd');
+  return items.map((item) => ({ params: { id: item.id }, props: { item } }));
+}
+
+const { item } = Astro.props as { item: CollectionEntry<'blog'> };
+const d = item.data;
+const { Content } = await render(item);
+const dienst = diensten.find((x) => x.slug === d.dienst);
+const url = new URL(`/blog/${item.id}/`, Astro.site).href;
+const artikelSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: d.titel,
+  description: d.samenvatting,
+  datePublished: d.datum.toISOString(),
+  mainEntityOfPage: url,
+  author: { '@type': 'Organization', name: 'Derycke Renovatie & Schilderwerken' },
+  publisher: { '@type': 'Organization', name: 'Derycke Renovatie & Schilderwerken' },
+};
+---
+
+<Basis
+  titel={d.titel}
+  omschrijving={d.samenvatting}
+  schema={[
+    kruimelSchema(Astro.site, [
+      { naam: 'Blog', href: '/blog/' },
+      { naam: d.titel, href: `/blog/${item.id}/` },
+    ]),
+    artikelSchema,
+  ]}
+>
+  <PaginaKop titel={d.titel} intro={d.samenvatting} kruimels={[{ naam: 'Blog', href: '/blog/' }, { naam: d.titel }]} />
+
+  <div class="wrap">
+    <Foto src={d.beeld} alt={d.beeldAlt} sizes="(min-width: 1320px) 1240px, 100vw" widths={[640, 960, 1400]} ratio="21 / 9" eager />
+  </div>
+
+  <article class="sectie">
+    <div class="wrap artikel">
+      <Content />
+      {
+        dienst && (
+          <a href={`/diensten/${dienst.slug}/`} class="tekstlink">
+            Meer over {dienst.titel.toLowerCase()} <Pijl />
+          </a>
+        )
+      }
+      <p class="terug"><a href="/blog/" class="tekstlink">Terug naar alle artikels</a></p>
+    </div>
+  </article>
+
+  <OfferteSlot />
+</Basis>
+
+<style>
+  .artikel {
+    max-width: var(--maat);
+  }
+  .artikel :global(p),
+  .artikel :global(li) {
+    font-size: 1.12rem;
+  }
+  .artikel :global(h2) {
+    margin-top: 2.25rem;
+  }
+  .artikel .tekstlink {
+    margin-top: 1.5rem;
+  }
+  .artikel .tekstlink :global(svg) {
+    width: 1rem;
+  }
+  .terug {
+    margin-top: 2rem;
+  }
+</style>

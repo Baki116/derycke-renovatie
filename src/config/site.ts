@@ -74,4 +74,5 @@ export const navigatie = [
   { href: '/realisaties/', label: 'Realisaties' },
   { href: '/voor-bedrijven/', label: 'Voor bedrijven' },
   { href: '/over-ons/', label: 'Over ons' },
+  { href: '/blog/', label: 'Blog' },
 ] as const;

@@ -34,4 +34,24 @@ const realisaties = defineCollection({
     }),
 });
 
-export const collections = { realisaties };
+/**
+ * Blog — artikels voor bezoekers en voor SEO.
+ * Elk artikel: src/content/blog/<slug>.md
+ */
+const blog = defineCollection({
+  loader: glob({ pattern: '[!_]*.md', base: './src/content/blog' }),
+  schema: ({ image }) =>
+    z.object({
+      titel: z.string(),
+      /** Korte omschrijving (meta description en overzicht), max. 160 tekens. */
+      samenvatting: z.string().max(160),
+      datum: z.coerce.date(),
+      beeld: image(),
+      beeldAlt: z.string(),
+      /** Slug van de bijhorende dienst, bv. 'schilderwerken'. */
+      dienst: z.string().optional(),
+      status: z.enum(['concept', 'gepubliceerd']).default('gepubliceerd'),
+    }),
+});
+
+export const collections = { realisaties, blog };

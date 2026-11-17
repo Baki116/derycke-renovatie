@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import Basis from '../../layouts/Basis.astro';
+import PaginaKop from '../../components/PaginaKop.astro';
+import Foto from '../../components/Foto.astro';
+import OfferteSlot from '../../components/OfferteSlot.astro';
+import { kruimelSchema } from '../../lib/schema';
+
+const artikels = (await getCollection('blog', (a) => a.data.status === 'gepubliceerd')).sort(
+  (a, b) => b.data.datum.getTime() - a.data.datum.getTime(),
+);
+const datum = (d: Date) => d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<Basis
+  titel="Blog: tips over renovatie en schilderwerken"
+  omschrijving="Praktische tips en advies over schilderwerken, badkamers, keukens en renovaties in Vlaanderen, van Derycke Renovatie & Schilderwerken."
+  schema={[kruimelSchema(Astro.site, [{ naam: 'Blog', href: '/blog/' }])]}
+>
+  <PaginaKop
+    titel="Tips en advies voor uw renovatie."
+    intro="Praktische uitleg over schilderwerken en renovaties: wat u kunt verwachten, waarop u let en hoe u uw project goed voorbereidt."
+    kruimels={[{ naam: 'Blog' }]}
+  />
+
+  <section class="sectie" aria-label="Artikels">
+    <div class="wrap lijst">
+      {
+        artikels.map((a) => (
+          <article class="kaart">
+            <a href={`/blog/${a.id}/`} class="kaart__link">
+              <Foto src={a.data.beeld} alt={a.data.beeldAlt} sizes="(min-width: 900px) 30vw, 100vw" widths={[480, 800]} ratio="3 / 2" />
+              <p class="kaart__datum"><time datetime={a.data.datum.toISOString()}>{datum(a.data.datum)}</time></p>
+              <h2 class="kaart__titel">{a.data.titel}</h2>
+              <p class="kaart__tekst">{a.data.samenvatting}</p>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <OfferteSlot />
+</Basis>
+
+<style>
+  .lijst {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .kaart__link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+  .kaart__datum {
+    margin: 1rem 0 0.25rem;
+    font-size: var(--fs-0);
+    color: var(--steen-donker);
+  }
+  .kaart__titel {
+    font-size: 1.35rem;
+    margin: 0 0 0.5rem;
+  }
+  .kaart__link:hover .kaart__titel {
+    text-decoration: underline;
+  }
+  .kaart__tekst {
+    margin: 0;
+  }
+</style>

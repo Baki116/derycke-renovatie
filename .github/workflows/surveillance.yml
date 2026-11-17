@@ -1,0 +1,51 @@
+# Abonnement Viewlaya : surveillance de la disponibilité, avec alerte.
+# En cas de panne, une « issue » « Incident » est ouverte (notification e-mail au propriétaire du dépôt),
+# puis fermée automatiquement quand le site répond de nouveau.
+name: Surveillance du site
+on:
+  schedule:
+    - cron: '23 7 * * 1'   # une fois par semaine, le lundi vers 8 h 23 (heure belge)
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/surveillance.yml']
+permissions:
+  issues: write
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Contrôles
+        id: c
+        run: |
+          erreurs=""
+          for p in / /contact/ /diensten/ /realisaties/ /sitemap-index.xml; do
+            code=$(curl -s -o page.txt -w '%{http_code}' --max-time 20 --retry 2 "https://deryckerenovatie.be$p")
+            [ "$code" = "200" ] || erreurs="$erreurs\n- https://deryckerenovatie.be$p répond $code"
+          done
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "https://www.deryckerenovatie.be/")
+          case "$code" in 301|308|200) ;; *) erreurs="$erreurs\n- www.deryckerenovatie.be répond $code";; esac
+          fin=$(echo | openssl s_client -servername deryckerenovatie.be -connect deryckerenovatie.be:443 2>/dev/null | openssl x509 -noout -enddate | cut -d= -f2)
+          if [ -n "$fin" ]; then
+            jours=$(( ( $(date -d "$fin" +%s) - $(date +%s) ) / 86400 ))
+            [ "$jours" -ge 10 ] || erreurs="$erreurs\n- certificat HTTPS : expire dans $jours jours"
+          else
+            erreurs="$erreurs\n- certificat HTTPS illisible"
+          fi
+          printf "%b" "$erreurs" > erreurs.txt
+          if [ -s erreurs.txt ]; then echo "ko=1" >> "$GITHUB_OUTPUT"; else echo "ko=0" >> "$GITHUB_OUTPUT"; fi
+          cat erreurs.txt
+      - name: Alerte ou retour à la normale
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          ouverte=$(gh issue list --label incident --state open --json number --jq '.[0].number')
+          if [ "${{ steps.c.outputs.ko }}" = "1" ]; then
+            if [ -z "$ouverte" ]; then
+              gh label create incident --color B60205 --force >/dev/null
+              { echo "Le site deryckerenovatie.be a un problème ($(date -u '+%d/%m/%Y %H:%M') UTC) :"; echo; cat erreurs.txt; } > corps.txt
+              gh issue create --title "Incident : deryckerenovatie.be" --label incident --body-file corps.txt
+            fi
+          elif [ -n "$ouverte" ]; then
+            gh issue close "$ouverte" --comment "Le site répond de nouveau normalement ($(date -u '+%d/%m/%Y %H:%M') UTC)."
+          fi
