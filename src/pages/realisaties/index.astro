@@ -24,7 +24,7 @@ const types = [...new Set(items.map((r) => r.data.typeWerken))];
     titel="Realisaties"
     intro={echte.length
       ? 'Een selectie van uitgevoerde projecten. Elk project toont het type werken en, met toestemming van de klant, de gemeente.'
-      : 'Hier verschijnen binnenkort de eerste projecten van Derycke. Intussen tonen we een selectie inspiratiebeelden die de stijl en afwerking weergeven die we nastreven.'}
+      : 'Hier verschijnen binnenkort de eerste projecten van Derycke. Intussen tonen we de stijl en afwerking die we nastreven.'}
     kruimels={[{ naam: 'Realisaties' }]}
   />
 
@@ -60,7 +60,7 @@ const types = [...new Set(items.map((r) => r.data.typeWerken))];
     <section aria-labelledby="voorna" class="blok">
       <div class="blok__kop">
         <h2 id="voorna">Voor en na</h2>
-        <p class="zacht">Schuif over het beeld om te vergelijken. Inspiratiebeelden, tot onze eigen werven gefotografeerd zijn.</p>
+        <p class="zacht">Schuif over het beeld om te vergelijken.</p>
       </div>
       <div class="voorna__raster" data-reveal-groep>
         {voorNa.map((p, i) => (
@@ -73,11 +73,7 @@ const types = [...new Set(items.map((r) => r.data.typeWerken))];
       inspiratie.length > 0 && (
         <section aria-labelledby="insp" class="blok">
           <div class="blok__kop">
-            <h2 id="insp">Inspiratiebeelden</h2>
-            <p class="notitie">
-              Deze beelden zijn inspiratiebeelden en tonen geen projecten die door Derycke uitgevoerd zijn. Ze worden
-              vervangen door echte realisaties.
-            </p>
+            <h2 id="insp">Inspiratie voor uw project</h2>
           </div>
           <div class="raster" data-reveal-groep>
             {inspiratie.map((r) => (

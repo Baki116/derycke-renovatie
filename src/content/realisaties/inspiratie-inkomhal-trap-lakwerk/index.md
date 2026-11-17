@@ -15,6 +15,6 @@ inspiratie: true
 datum: 2026-10-28
 ---
 
-Dit inspiratiebeeld toont hoe lakwerk een bestaande inkomhal een nieuw karakter kan geven. Trap, deuren en plinten krijgen dezelfde tint, de wanden blijven licht.
+Dit beeld toont hoe lakwerk een bestaande inkomhal een nieuw karakter kan geven. Trap, deuren en plinten krijgen dezelfde tint, de wanden blijven licht.
 
 Lakwerk vraagt veel voorbereiding: ontvetten, schuren, herstellen en een geschikte grondlaag. Pas dan krijgt de laatste laag de gelijkmatige glans die u op het beeld ziet.

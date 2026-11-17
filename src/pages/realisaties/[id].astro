@@ -25,7 +25,7 @@ const kenmerken = [
 ---
 
 <Basis
-  titel={d.inspiratie ? `Inspiratie: ${d.titel}` : d.titel}
+  titel={d.titel}
   omschrijving={d.samenvatting}
   schema={[
     kruimelSchema(Astro.site, [
@@ -35,14 +35,6 @@ const kenmerken = [
   ]}
 >
   <PaginaKop titel={d.titel} intro={d.samenvatting} kruimels={[{ naam: 'Realisaties', href: '/realisaties/' }, { naam: d.titel }]}>
-    {
-      d.inspiratie && (
-        <p class="notitie insp">
-          Inspiratiebeeld. Dit is geen project dat door Derycke uitgevoerd werd. Het toont de stijl en afwerking die we
-          nastreven.
-        </p>
-      )
-    }
   </PaginaKop>
 
   <div class="wrap">

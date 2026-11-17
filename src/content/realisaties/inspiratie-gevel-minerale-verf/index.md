@@ -11,6 +11,6 @@ inspiratie: true
 datum: 2026-10-25
 ---
 
-Dit inspiratiebeeld toont een buitenschilderwerk waarbij gevel en schrijnwerk samen bekeken worden. Het contrast tussen een lichte gevel en donker schrijnwerk geeft een klassieke woning een eigentijdse uitstraling.
+Dit beeld toont een buitenschilderwerk waarbij gevel en schrijnwerk samen bekeken worden. Het contrast tussen een lichte gevel en donker schrijnwerk geeft een klassieke woning een eigentijdse uitstraling.
 
 Bij buitenschilderwerk kiezen we het product in functie van de ondergrond en houden we rekening met het weer bij de planning.

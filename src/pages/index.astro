@@ -128,16 +128,8 @@ const redenen = [
     <div class="wrap">
       <div class="realisaties__kop" data-reveal>
         <h2 id="real-titel">{alleenInspiratie ? 'Inspiratie voor uw project' : 'Recente realisaties'}</h2>
-        <a href="/realisaties/" class="tekstlink">{alleenInspiratie ? 'Bekijk alle inspiratiebeelden' : 'Bekijk alle realisaties'}</a>
+        <a href="/realisaties/" class="tekstlink">{alleenInspiratie ? 'Bekijk meer inspiratie' : 'Bekijk alle realisaties'}</a>
       </div>
-      {
-        alleenInspiratie && (
-          <p class="notitie realisaties__melding">
-            Deze selectie bestaat uit inspiratiebeelden, geen realisaties van Derycke. Onze eigen werven verschijnen hier
-            zodra ze gefotografeerd zijn.
-          </p>
-        )
-      }
       <div class="realisaties__grid" data-reveal-groep>
         {
           realisaties.map((r, i) => (
